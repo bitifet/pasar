@@ -1,0 +1,33 @@
+{
+  "name": "PASAR",
+  "version": "0.0.0",
+  "description": "Promise Aware API REST generator to easily build Express-like routers with smart API REST capabilities including extensible output formatters.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bitifet/pasar"
+  },
+  "keywords": [
+    "promise",
+    "api",
+    "rest",
+    "express",
+    "router",
+    "smart",
+    "async",
+    "export",
+    "caché"
+  ],
+  "author": "Joan Miquel Torres <jmtorres@112ib.com>",
+  "license": "GPL",
+  "bugs": {
+    "url": "https://github.com/bitifet/pasar/issues"
+  },
+  "dependencies": {
+    "express": "~4.12.4",
+    "json2html": "0.0.8"
+  }
+}
