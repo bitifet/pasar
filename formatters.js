@@ -32,7 +32,7 @@ module.exports = { // Filter implementations:
                 + "<html>\n"
                 + "<head>\n"
                 + "<title>\n"
-                + Parsers.html(input.meta.title)
+                + input.meta.title
                 + "</title>\n"
                 + "</head>\n"
                 + "<body>\n"
