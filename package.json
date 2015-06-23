@@ -1,7 +1,7 @@
 {
   "name": "pasar",
   "version": "0.0.1",
-  "description": "Promise Aware Smart API REST generator to easily build Express routers with advanced capabilities.",
+  "description": "Promise Aware Smart API REST builder to easily implement Express routers with advanced capabilities.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -22,12 +22,13 @@
     "caché"
   ],
   "author": "Joan Miquel Torres <jmtorres@112ib.com>",
-  "license": "GPL",
+  "license": "GPL-3.0",
   "bugs": {
     "url": "https://github.com/bitifet/pasar/issues"
   },
   "dependencies": {
     "express": "~4.12.4",
+    "jade": "^1.11.0",
     "json2html": "0.0.8"
   }
 }
