@@ -1,0 +1,46 @@
+doctype html
+html
+  head
+    title.
+        #{path} (#{meta.title})
+    style.
+        nav.menu {
+            top: 0px;
+            float: right;
+        }
+        nav.menu a {
+            padding: .5em;
+            background: #eeeeff;
+            border: #0066aa solid 1px;
+            border-right: #004466 solid 3px;
+            border-bottom: #004466 solid 3px;
+        }
+        nav.menu a:hover {
+            border: #0066aa solid 3px;
+            border-right: #004466 solid 1px;
+            border-bottom: #004466 solid 1px;
+        }
+
+  body
+    nav.menu
+        a(href="../help") Index
+    h1= meta.title
+    div
+        h2 Function path:
+        p= path
+    div
+        h2 Description:
+        p.
+            !{contents}
+    div
+        h2 Valid methods:
+        ul
+            each m, name in methods
+                li
+                    b.
+                        #{name}:&nbsp;
+                    span= m.description
+                        if ! m.implemented
+                            b.
+                                &nbsp;(UNIMPLEMENTED)
+

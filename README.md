@@ -1,7 +1,7 @@
 PASAR
 =====
 
-Promise Aware Smart API Rest generator.
+Promise Aware Smart API Rest builder.
 
 Let's to easily build Express routers with an Smart API REST facilites.
 
@@ -16,11 +16,11 @@ Features:
     - .json
     - .html
     - .csv
-    - ....
+    - (more comming soon...)
 
-  * Easy access to self explanation (adding '/help' to each url).
+  * Easy access to self explanation (adding '/help' to each url) and fully automated help index.
 
-  * Internally reusable: API function implementation can easily make use of othre functions.
+  * Internally reusable: API function implementation can easily make use of other functions.
 
   * Input and Output mapping functions. (TODO)
 
@@ -79,8 +79,21 @@ All API definitions should look's like follows:
                         reject(error);
                 });
             },
-            help: "Explain what this function does..." // This will be accessible at /someFunction/help path.
-
+            _post: function(input) {
+                // ...
+            },
+            help: {
+                contents: "Explain what this function does...",
+                brief: "Brief explanation to be shown in whole API help index",
+                    // If not given, brief will be auto-extracted from contents.
+                methods: {
+                    'all': "Method specific explanation", // Default text. I ommitted, defaults to "(Undocumented)".
+                    '_get": "Specific explanation for GET method", // 'get' and '_get' are threated the same.
+                    // 'post': "", // As commented out, it will default to "all" text.
+                    'put': "Some future method explanation.", // Will be marked as "UNIMPLEMENTD".
+                    // 'delete': "", // As commented out and unimplemented, will NOT be shown.
+                }
+            },
         },
         someOtherFunction: {
             _all: function(input) {
@@ -97,11 +110,7 @@ All API definitions should look's like follows:
                         reject(error);
                 });
             },
-            help: { // More explicit. Other content-type support will be implemented later...
-                ctype: "text/plain",
-                brief: "Brief explanation",
-                contents: "Explain what this other function does...",
-            },
+            help: "Explain what this function does..." // Simplest way to specify minimal help text.
       },
     };
 ```

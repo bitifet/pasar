@@ -9,8 +9,16 @@
 // @license: GPL
 //
 "use strict";
+var Path = require("path");
 var Express = require("express");
+var Util = require("./util.js");
 var OutputFormatters = require("./formatters.js");
+var Cfg = require("./cfg.js");
+
+var Tpl = {
+    helpIndex: Util.tpl("helpIndex.jade"),
+    helpItem: Util.tpl("helpItem.jade"),
+};
 
 function defaultRequestMapper (req, method) {//{{{
     return req.body;
@@ -48,26 +56,9 @@ function buildHandler(//{{{
             res.send(result.data);
         })
         .catch(function(err){
-            res.sendStatusMessage('error', err.toString());
+            Util.sendStatusMessage('error', err.toString());
         });
     });
-};//}}}
-
-function renderHelp(hlp) {//{{{
-    if (typeof hlp == "string") { // Defaults tot text/plain.
-        hlp = {
-            ctype: "text/plain",
-            contents: hlp,
-        };
-    };
-
-    switch (hlp.type) {
-        case "txt":
-        default:
-            return hlp;
-    };
-
-
 };//}}}
 
 
@@ -79,14 +70,16 @@ module.exports = function APIloader(api) { //{{{
     for (var rtPath in api) {
         var spc = api[rtPath];
         rtPath = "/" + rtPath;
+        spc.help = Util.hlpAutocomplete(spc, rtPath);
 
-        R.get(rtPath + "/help", function(req, res, next) {
-            var h = renderHelp(spc.help);
-            res.header("Content-Type", h.ctype);
-            res.send(h.contents);
-        });
+        (function (hlp) {
+            R.get(rtPath + "/help", function renderHelpItem(req, res, next) {
+                res.header("Content-Type", "text/html");
+                res.send(Tpl.helpItem(hlp));
+            });
+        })(spc.help);
 
-        ['get', 'post', 'put', 'delete', 'all'].map(function(method){
+        Cfg.validMethods.map(function(method){
 
             // Get route Handler (Controller)://{{{
             var rtHandler = spc["_" + method];
@@ -129,6 +122,17 @@ module.exports = function APIloader(api) { //{{{
         });
 
     };
+
+    R.get("/help", function renderHelpIndex(req, res, next) {
+        res.header("Content-Type", "text/html");
+        res.send(Tpl.helpIndex({
+            path: Path.dirname(req.uri.pathname),
+            fn: Object.keys(api).map(function(rPath){return api[rPath].help;}),
+        }));
+    });
+
+
+
 
     return R;
 };//}}}
