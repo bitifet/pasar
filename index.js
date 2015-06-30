@@ -56,7 +56,7 @@ function buildHandler(//{{{
             res.send(result.data);
         })
         .catch(function(err){
-            Util.sendStatusMessage('error', err.toString());
+            Util.sendStatusMessage(res, 'error', err.toString());
         });
     });
 };//}}}

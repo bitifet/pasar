@@ -140,7 +140,7 @@ var Util = {
 
         return hlp;
     },//}}}
-    sendStatusMessage: function sendStatusMessage(stName, msg) {//{{{
+    sendStatusMessage: function sendStatusMessage(res, stName, msg) {//{{{
         var st = Cfg.statIdx[stName];
         if (st === undefined) {
             console.error("Wrong status name: " + stName);

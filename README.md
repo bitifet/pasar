@@ -22,7 +22,7 @@ Features:
 
   * Internally reusable: API function implementation can easily make use of other functions.
 
-  * Input and Output mapping functions. (TODO)
+  * Input and Output (TODO) mapping functions.
 
   * Easy testing witn automated (but customizable) '/form' views. (TODO)
 
