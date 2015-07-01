@@ -43,4 +43,13 @@ html
                         if ! m.implemented
                             b.
                                 &nbsp;(UNIMPLEMENTED)
-
+    if Object.keys(examples).length
+        div
+            h2 Examples:
+                ul
+                  each eBlock, method in examples
+                    each e, i in eBlock
+                        li
+                            b.
+                                (#{e.method})&nbsp;
+                            a(href=e.url, title=e.comments)= e.label

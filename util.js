@@ -11,8 +11,66 @@
 "use strict";
 var Fs = require("fs");
 var Path = require("path");
+var Url = require("url");
 var Jade = require("jade");
 var Cfg = require("./cfg.js");
+
+
+function mapMethods (//{{{
+    src,
+    input,
+    defVal,
+    cbk
+) {
+    defVal = (typeof input == "string" || input instanceof String)
+        ? input
+        : defVal
+    ;
+    if (input === undefined) input = {};
+    if (cbk === undefined) {
+        cbk = function(value, implemented, method) {
+            return implemented ? value : undefined;
+        };
+
+    };
+
+    var output = {};
+
+    // Sanityze and format:
+    Object.keys(input).map(function(k) {
+        var contents = input[k];
+        if (k[0] == "_") k = k.substring(1); // Accept "_get" as "get".
+        if (k == "all") {
+            defVal = contents;
+        } else {
+            var implemented = (typeof src["_" + k] == "function");
+            var value = cbk(contents, implemented, k);
+            if (value !== undefined) output[k] = value;
+        };
+
+    });
+
+    // Autocomplete not explicitly documented methods:
+    Cfg.validMethods
+        .filter(function(k){
+            return (k != "all") // Not "all" wildcard.
+                && (output[k] === undefined) // Not explicitly documented.
+                && ( // Implemented:
+                    (typeof src["_" + k] == "function") // Specifically.
+                    || (typeof src["_all"] == "function") // Default implementation.
+                )
+            ;
+        })
+        .map(function(k){
+            var value = cbk(defVal, true, k);
+            if (value !== undefined) output[k] = value;
+        })
+    ;
+
+    return output;
+
+};//}}}
+
 
 
 var Util = {
@@ -90,53 +148,55 @@ var Util = {
             };
         };
 
-        hlp.methods = (function (input) {//{{{
-            var defText = (typeof input == "string" || input instanceof String)
-                ? input
-                : "(undocumented)"
-            ;
-            if (input === undefined) input = {};
 
-            var output = {};
-
-            // Sanityze and format:
-            Object.keys(input).map(function(k) {
-                var contents = input[k];
-                if (k[0] == "_") k = k.substring(1); // Accept "_get" as "get".
-                if (k == "all") {
-                    defText = contents;
-                } else {
-                    var implemented = (typeof src["_" + k] == "function");
-                    output[k] = {
-                        description: contents,
-                        implemented: implemented,
-                    };
+        hlp.methods = mapMethods (
+            src,
+            hlp.methods,
+            "(undocumented)",
+            function expandMethodHelp(value, implemented) {
+                return {
+                    description: value,
+                    implemented: implemented,
                 };
+            }
+        );
 
-            });
-
-            // Autocomplete not explicitly documented methods:
-            Cfg.validMethods
-                .filter(function(k){
-                    return (k != "all") // Not "all" wildcard.
-                        && (output[k] === undefined) // Not explicitly documented.
-                        && ( // Implemented:
-                            (typeof src["_" + k] == "function") // Specifically.
-                            || (typeof src["_all"] == "function") // Default implementation.
-                        )
-                    ;
-                })
-                .map(function(k){
-                    output[k] = {
-                        description: defText,
-                        implemented: true,
+        hlp.examples = mapMethods (
+            src,
+            hlp.examples,
+            undefined,
+            function expandMethodExamples(input, implemented, method) {
+                if (input === undefined) return;
+                var output = [];
+                for (var i in input) {
+                    if (input[i] instanceof Array) {
+                        var lbl = input[i][0];
+                        var prm = input[i][1];
+                        var comments = input[i][2];
+                    } else {
+                        var prm = input[i];
+                        var comments = '';
                     };
-                })
-            ;
+                    var url = method == "get"
+                        ? Url.format({
+                            pathname: ".." + hlp.path,
+                            query: prm,
+                        })
+                        : "#"
+                    ;
+                    if (typeof lbl === "object" || ! lbl) lbl = url.substring(2);
 
-            return output;
-
-        })(hlp.methods);//}}}
+                    output.push({
+                        method: method,
+                        label: lbl,
+                        prm: prm,
+                        comments: comments,
+                        url: url,
+                    });
+                };
+                return output;
+            }
+        );
 
         return hlp;
     },//}}}

@@ -92,7 +92,24 @@ All API definitions should look's like follows:
                     // 'post': "", // As commented out, it will default to "all" text.
                     'put': "Some future method explanation.", // Will be marked as "UNIMPLEMENTD".
                     // 'delete': "", // As commented out and unimplemented, will NOT be shown.
-                }
+                },
+                examples: { // (get/_get, post...) Just like methods definitions...
+                    get: [, // Simple GET example without parameters labelled by its url.
+                         {}, // Add example to query without parameters.
+                         ['label', {foo: "bar"}, "Some optional comment"], // Another with parameters.
+                         [null, [bar: "baz"}], // Another auto-labelled example.
+                             // NOTE: All get examples are automatically linked to it's url.
+                             // NOTE 2: Post, put, etc... are actually linked to "#".
+                             //     In (I hope) near future I expect to implement links to them via ajax call (TODO).
+                             // NOTE 3: Simplest get specification is: «get: [{}]»,
+                    ],
+                    post: [
+                        ['Hello', {foo: "bar"}, "long explanation"],
+                        ['World', {foo: "bar"}, "More longer explanation"],
+                    ],
+                    put: [{foo: "bar"}],
+                    // ...
+                },
             },
         },
         someOtherFunction: {

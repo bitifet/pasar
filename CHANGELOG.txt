@@ -1,0 +1,22 @@
+CHANGELOG.txt
+=============
+
+"version": "0.0.4",
+    Implemented help examples.
+    Added this changelog.
+
+"version": "0.0.3",
+    Brief result resolution syntax.
+    Fixed bug in error hanling.
+
+"version": "0.0.2",
+    Jade templating for help pages and minor fixes.
+
+"version": "0.0.1",
+    Changed "generator" for "builder" in to avoid confussion with ES_6 generators.
+    Minor fixes.
+    Also fixed license version.
+
+"version": "0.0.0",
+    Initial implementation.
+
