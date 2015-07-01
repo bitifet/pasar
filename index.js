@@ -29,10 +29,19 @@ var outputFilters = (//{{{
         var flt = {};
         Object.keys(src).map(function wrapFixations(fltName) {
             flt[fltName] = function(input) {
-                if (input === undefined) input = {};
-                if (input.meta === undefined) input.meta = {};
-                if (input.data === undefined) input.data = {};
-                return src[fltName](input);
+                var output = {};
+                if (input !== undefined) {
+                    if (input.data === undefined) {
+                        // Accept result without data/metadata separation when
+                        // there is no metadata to pass thought.
+                        // (Only if no data vector present)
+                        output.data = input;
+                    } else {
+                        output = input;
+                    };
+                    if (output.meta === undefined) output.meta = {};
+                };
+                return src[fltName](output);
             };
         });
         return flt;

@@ -101,11 +101,18 @@ All API definitions should look's like follows:
                 return new Promise(function(resolve, reject) {
                         // Do some async stuff...
                         // And somewhere:
-                        resolve({
-                            data: {...}, // Actual function response.
-                            meta: {...}, // Some optional metadata which could be used by many output filteres.
-                                        // i.e. page title, field types, etc...
-                        });
+                        resolve({...});
+                            // If no need for metadata and no data vector specified,
+                            // this will be automagically remapped to:
+                            // {
+                            //     data: {...}, // Actual function response.
+                            //     meta: {...}, // Some optional metadata which could be used by many output filteres.
+                            //                 // i.e. page title, field types, etc...
+                            // }
+                            // ...so you can simply resolve with your actual result EXCEPT if it could contain
+                            // a 'data' vector in its root level. In which case you should at least resolve
+                            // with {data:{...}}
+
                         // And in some other place:
                         reject(error);
                 });
