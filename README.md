@@ -71,6 +71,12 @@ All API definitions should look's like follows:
     var Promise = require("promise"); // Or your favorite promise library.
     var Pasar = require("pasar");
 
+    var Options = {
+        // noLib: true,     // Comment-out to disable .fn and .syncFn facilites.
+        // noHelp: true,    // Comment-out to disable /help facilities.
+        // noFilters: true, // Comment-out to disable optional formatting filters.
+    };
+
     var myApi = {
         someFunction: {
             _get: function(input) {
@@ -146,7 +152,8 @@ All API definitions should look's like follows:
       },
     };
     
-    module.exports = Pasar(myApi);
+    module.exports = Pasar(myApi, Options);
+
 ```
 
 
