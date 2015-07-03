@@ -29,6 +29,7 @@
   "dependencies": {
     "express": "~4.12.4",
     "jade": "^1.11.0",
-    "json2html": "0.0.8"
+    "json2html": "0.0.8",
+    "promise": "^7.0.3"
   }
 }

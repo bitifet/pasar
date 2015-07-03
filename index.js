@@ -11,6 +11,7 @@
 "use strict";
 var Path = require("path");
 var Express = require("express");
+var Promise = require("promise");
 var Util = require("./util.js");
 var OutputFormatters = require("./formatters.js");
 var Cfg = require("./cfg.js");
@@ -71,22 +72,60 @@ function buildHandler(//{{{
 };//}}}
 
 
+
+var exposeCallable = (function(){
+
+    function buildFunction (handler, filter) {//{{{
+        return function () {
+            return new Promise(function(resolve, reject){
+                handler.apply(this, arguments)
+                    .then(function(result){
+                        resolve(filter(result));
+                    })
+                    .catch(reject)
+                ;
+            });
+        };
+    };//}}}
+
+
+    return function buildCallable(R, fName, handler, method){ // Expose handler as callable function://{{{
+
+        // With default output filter:
+        if (R.fn[fName] === undefined) R.fn[fName] = {};
+        R.fn[fName][method] = buildFunction(handler, outputFilters[Cfg.defaultOutputFilter]);
+
+        // For all available filters:
+        for (var ext in outputFilters) {
+            if (R.fn[fName+"."+ext] === undefined) R.fn[fName+"."+ext] = {};
+            R.fn[fName+"."+ext][method] = buildFunction(handler, outputFilters[ext]);
+        };
+
+    }; //}}}
+
+
+})();
+
+
 module.exports = function APIloader(api) { //{{{
-    // Create local router and attach to master one.
+    // Create new router:
     var R = Express.Router();
+    R.fn = {};
 
     // Populate all specified routes:
     for (var rtPath in api) {
-        var spc = api[rtPath];
-        rtPath = "/" + rtPath;
-        spc.help = Util.hlpAutocomplete(spc, rtPath);
+        var fName = rtPath.replace("/", "_"); // Exposed function name.
+        var spc = api[rtPath];               // Function full specification.
+        rtPath = "/" + rtPath;               // Route base path.
 
+        // Build help item route://{{{
+        spc.help = Util.hlpAutocomplete(spc, rtPath);
         (function (hlp) {
             R.get(rtPath + "/help", function renderHelpItem(req, res, next) {
                 res.header("Content-Type", "text/html");
                 res.send(Tpl.helpItem(hlp));
             });
-        })(spc.help);
+        })(spc.help);//}}}
 
         Cfg.validMethods.map(function(method){
 
@@ -94,6 +133,8 @@ module.exports = function APIloader(api) { //{{{
             var rtHandler = spc["_" + method];
             if (rtHandler === undefined) return; // Avoid trying to map unspecified method handlers.
             //}}}
+
+            exposeCallable (R, fName, rtHandler, method);
 
             // Pick appropriate input mapper://{{{
             var inputMapper = defaultRequestMapper;
@@ -112,7 +153,7 @@ module.exports = function APIloader(api) { //{{{
                 method,
                 rtHandler,
                 inputMapper,
-                outputFilters.json
+                outputFilters[Cfg.defaultOutputFilter]
             );
             //}}}
 
@@ -132,16 +173,27 @@ module.exports = function APIloader(api) { //{{{
 
     };
 
+    // Build help index route://{{{
     R.get("/help", function renderHelpIndex(req, res, next) {
         res.header("Content-Type", "text/html");
         res.send(Tpl.helpIndex({
             path: Path.dirname(req.uri.pathname),
-            fn: Object.keys(api).map(function(rPath){return api[rPath].help;}),
+            fn: Object.keys(api).map(function(rtPath){return api[rtPath].help;}),
         }));
-    });
+    });//}}}
 
-
-
+    // Shorthand for single-method functions://{{{
+    Object.keys(R.fn).filter(function(k){
+        var methods = Object.keys(R.fn[k]);
+        if ( // Function has only one (get/post/.../all) method.
+            methods.length === 1
+        ) { // Let to access it directly as R.fn[fName]() without ".get", ".post", etc..
+            var mtd = methods[0];
+            var mainFn = R.fn[k][mtd];
+            R.fn[k] = mainFn;
+            R.fn[k][mtd] = mainFn;
+        };
+    });//}}}
 
     return R;
 };//}}}

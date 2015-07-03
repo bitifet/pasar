@@ -27,6 +27,11 @@ Let's to easily build Express routers with an Smart API REST facilites.
     - Method handlers receive JSON object with request parameters NOT request, nor response or next express objects.
     - Also, they are expected to return promises, not actual data or, even less, to deal with http handshaking.
 
+  * Externally reusable: All API functions are externally exposed thought 'fn' property of the resulting router.
+    - I.E.: myRouter.fn.someFunction.get({...}); // will call that method handler directly.
+    - If it has only one available method definition (even if it is 'all'), simply: myRouter.fn.someFunction({...});
+    - Also, you can use all available output filters. Example: myRouter.fn["someFunction.html"].get({...});
+
   * More comming... (see [TODO](#TODO) )
 
   * For latest changes see: [CHANGELOG](CHANGELOG.txt)
@@ -53,32 +58,14 @@ Maybe you would like to help in building better one... (see [Contributing](#cont
 <a name="examples"></a>Examples:
 --------------------------------
 
-To build a new API REST simply:
-
-```javascript
-    var Express = require('express');
-    var Router = Express.Router();
-    var pAPI = require("pasar");
-
-    // Load API definitions:
-    var someAPI = require("__path_to_my_api__");
-    var someOtherAPI = require("__path_to_my_api__");
-
-    // To mount your api at /api route:
-    Router.use('/api', pAPI(someAPI));
-
-    // To mount your api at your router root:
-    Router.use(pAPI(someOtherAPI));
-```
-
-
 All API definitions should look's like follows:
 
 
 ```javascript
     var Promise = require("promise"); // Or your favorite promise library.
+    var Pasar = require("pasar");
 
-    module.exports = {
+    var myApi = {
         someFunction: {
             _get: function(input) {
                 // Do some stuff...
@@ -152,7 +139,41 @@ All API definitions should look's like follows:
             help: "Explain what this function does..." // Simplest way to specify minimal help text.
       },
     };
+    
+    module.exports = Pasar(myApi);
 ```
+
+
+
+Then, to mount your API REST to your Express router simply:
+
+```javascript
+    var Express = require('express');
+    var Router = Express.Router();
+
+    // Load API definitions:
+    var someAPI = require("__path_to_my_api__");
+    var someOtherAPI = require("__path_to_my_other_api__");
+
+    // To mount your api at /api route:
+    Router.use('/api', someAPI);
+
+    // To mount your api at your router root:
+    Router.use(someOtherAPI);
+
+    // To access API functions as library:
+    someApi.fn.someFunction({foo: "bar"})
+        .then(function(data){console.log(data);})
+        .catch(throw)
+    ;
+
+    // Or simply:
+    // Router.use('/api', require("__path_to_my_api__"))  // Mounted on /api.
+    // Router.use(require("__path_to_my_other_api__"))    // Mounted on root.
+    // var myAsyncLib = require("__path_to_my_api__").fn; // Async (returns promises).
+
+```
+
 
 
 <a name="TODO"></a> TODO:

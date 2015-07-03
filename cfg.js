@@ -10,6 +10,7 @@
 //
 "use strict";
 module.exports = {
+    defaultOutputFilter: "json",
     tplBriefLenght: 400,
     validMethods: ['get', 'post', 'put', 'delete', 'all'],
     statIdx: {
