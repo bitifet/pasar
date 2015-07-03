@@ -15,6 +15,24 @@ var Url = require("url");
 var Jade = require("jade");
 var Cfg = require("./cfg.js");
 
+var versionCheck = (function(){//{{{
+    var nodeVersion = process.version.substring(1).split(".");
+    function checkVersion (v, v0) {
+        if (v0 === undefined) v0 = nodeVersion;
+        if (!(v instanceof Array)) {
+            v = v.substring(1).split(".");
+        };
+        var n = v.shift();
+        var n0 = v0.shift();
+        if (n > n0) return false;
+        if (n < n0) return true;
+        if (n == n0) return v.length
+            ? checkVersion (v, v0)
+            : true
+        ;
+    };
+    return checkVersion;
+})();//}}}
 
 function mapMethods (//{{{
     src,
@@ -70,7 +88,6 @@ function mapMethods (//{{{
     return output;
 
 };//}}}
-
 
 
 var Util = {
@@ -207,6 +224,15 @@ var Util = {
             return res.status(Cfg.statIdx.error).send("Internal Server Error");
         } else return res.status(st).send(msg);
     },//}}}
+    deasync: (function(){//{{{
+        var requiredVersion = "v0.11.0";
+        if (versionCheck(requiredVersion)) return require("deasync");
+        return function noobDeasync(){
+            return function(){
+                throw "Sync functions are not supported in node versions earlier than " + requiredVersion;
+            };
+        };
+    })(),//}}}
 };
 
 module.exports=Util;

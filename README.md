@@ -32,6 +32,12 @@ Let's to easily build Express routers with an Smart API REST facilites.
     - If it has only one available method definition (even if it is 'all'), simply: myRouter.fn.someFunction({...});
     - Also, you can use all available output filters. Example: myRouter.fn["someFunction.html"].get({...});
 
+  * Externally reusable SYNCHRONOUSLY: Just like 'fn', router is provided with 'syncFn' vector providing sync versions of your API functions.
+    - This enables you to reuse simple functionalities as sync functions.
+    - But be carefull, that THOSE ARE BLOCKING FUNCTIONS. So use at your own risk.
+    - Available only for Node version v0.11.0 or hihger.
+    - FIXME: Untested (I'm currently developing on Node v0.10.25) so it could not work at all.
+
   * More comming... (see [TODO](#TODO) )
 
   * For latest changes see: [CHANGELOG](CHANGELOG.txt)
@@ -162,10 +168,22 @@ Then, to mount your API REST to your Express router simply:
     Router.use(someOtherAPI);
 
     // To access API functions as library:
-    someApi.fn.someFunction({foo: "bar"})
+    someApi.fn.someFunction.get({foo: "bar"})
         .then(function(data){console.log(data);})
         .catch(throw)
     ;
+
+    // Also with available output filters:
+    var resultPromise = somApi.fn["someFunction.html"]({foo: "bar"}); // Promise. Use .then(), .catch()...
+        // ".get", ".post", etc... can be ommited when only one method is implemented.
+
+    // To access API functions as sync library:
+    var result = someApi.syncFn.someFunction({foo: "bar"});
+        // WARNING:
+        //      * Sync functions are blocking. Use at your own risk!!
+        //      * They are not availible in Node versions under v0.11.0.
+        //      * In earlier Node versions, it will throw an exception if you try to use it.
+        //      * Not yet tested (sorry) could not properly work even with node v0.11.0 or higher.
 
     // Or simply:
     // Router.use('/api', require("__path_to_my_api__"))  // Mounted on /api.

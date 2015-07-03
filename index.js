@@ -71,9 +71,7 @@ function buildHandler(//{{{
     });
 };//}}}
 
-
-
-var exposeCallable = (function(){
+var exposeCallable = (function(){//{{{
 
     function buildFunction (handler, filter) {//{{{
         return function () {
@@ -88,29 +86,37 @@ var exposeCallable = (function(){
         };
     };//}}}
 
-
     return function buildCallable(R, fName, handler, method){ // Expose handler as callable function://{{{
 
         // With default output filter:
-        if (R.fn[fName] === undefined) R.fn[fName] = {};
+        if (R.fn[fName] === undefined) {
+            R.fn[fName] = {};
+            R.syncFn[fName] = {};
+        };
         R.fn[fName][method] = buildFunction(handler, outputFilters[Cfg.defaultOutputFilter]);
+        R.syncFn[fName][method] = Util.deasync (R.fn[fName][method]);
 
         // For all available filters:
         for (var ext in outputFilters) {
-            if (R.fn[fName+"."+ext] === undefined) R.fn[fName+"."+ext] = {};
+            if (R.fn[fName+"."+ext] === undefined) {
+                R.fn[fName+"."+ext] = {};
+                R.syncFn[fName+"."+ext] = {};
+            };
             R.fn[fName+"."+ext][method] = buildFunction(handler, outputFilters[ext]);
+            R.syncFn[fName+"."+ext][method] = Util.deasync(R.fn[fName+"."+ext][method]);
         };
 
     }; //}}}
 
 
-})();
+})();//}}}
 
 
 module.exports = function APIloader(api) { //{{{
     // Create new router:
     var R = Express.Router();
     R.fn = {};
+    R.syncFn = {};
 
     // Populate all specified routes:
     for (var rtPath in api) {
@@ -189,9 +195,12 @@ module.exports = function APIloader(api) { //{{{
             methods.length === 1
         ) { // Let to access it directly as R.fn[fName]() without ".get", ".post", etc..
             var mtd = methods[0];
-            var mainFn = R.fn[k][mtd];
-            R.fn[k] = mainFn;
-            R.fn[k][mtd] = mainFn;
+            var asyncFn = R.fn[k][mtd];
+            var syncFn = R.syncFn[k][mtd];
+            R.fn[k] = asyncFn;
+            R.fn[k][mtd] = asyncFn;
+            R.syncFn[k] = syncFn;
+            R.syncFn[k][mtd] = syncFn;
         };
     });//}}}
 
