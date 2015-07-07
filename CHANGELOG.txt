@@ -1,6 +1,9 @@
 CHANGELOG.txt
 =============
 
+    Overridable default preferences (thought Options object).
+    Client-side preferences like jQuery path to be used in help and form views.
+
 "version": "0.0.6",
     Tested and fixed syncFn (synchronous library access) capabilities.
     Let to use user specified Promise Engine thought Options.promiseEngine.

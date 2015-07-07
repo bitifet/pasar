@@ -100,6 +100,11 @@ noFilters (boolean, default = false)
 promiseEngine
 : Let's to provide your own Promise engine.
 
+defaults
+: Let's define default values to be merged with all API function definiton. Not fully functional yet. But let's define defaults.help.examples as ``"{get: [{}]}"``.
+
+client
+: Client preferences (passed as 'prefs') to all special views templates (like help or form views). Can have some predefined values, like jQuery (client.jQuery) providding path to that javascript client library.
 
 
 <a name="advFeatures"></a>Advanced Features

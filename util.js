@@ -99,7 +99,47 @@ var deasync = (function(){//{{{
     };
 })();//}}}
 
+function propSet(target, path, value) {//{{{
+    if (value === undefined) return;
+    if (!(path instanceof Array)) path = path.split(".");
+    var prop = path.shift();
+    if (path.length) {
+        if (target[prop] === undefined) target[prop] = {};
+        propSet(target[prop], path, value);
+    } else if (target[prop] === undefined) target[prop] = value;
+};//}}}
+
+function propGet(target, path) {//{{{
+    if (!(path instanceof Array)) path = path.split(".");
+    var prop = path.shift();
+    if (path.length) {
+        return target[prop] === undefined
+            ? undefined
+            : propGet(target[prop], path)
+        ;
+    } else return target[prop];
+};//}}}
+
+
 var Util = {
+    buildPrefs: function applyDefaultPreferences(Options) {//{{{
+
+        var prefs = {};
+
+        // Sanityze options:
+        if (Options === undefined) Options = {};
+
+        // Accept all options as preferences:
+        Object.keys(Options).filter(function(k){
+            prefs[k] = Options[k];
+        });
+
+        // Define some extra default values:
+        propSet(prefs, "client.jQuery", Cfg.paths.jQuery);
+
+        return prefs;
+
+    },//}}}
     tpl: function tplCompile(tplPath) {//{{{
         var fullPath = Path.resolve(__dirname, "tpl/" + tplPath);
         return Jade.compile (
@@ -147,7 +187,7 @@ var Util = {
       return (str + '')
         .replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1' + breakTag + '$2');
     },//}}}
-    hlpAutocomplete: function hlpAutocompleter(src, fnPath) {//{{{
+    hlpAutocomplete: function hlpAutocompleter(src, fnPath, prefs) {//{{{
         var hlp = src.help;
 
         if (typeof hlp == "string") {
@@ -157,6 +197,7 @@ var Util = {
         };
         hlp.meta = src.meta;
         hlp.path = fnPath;
+        hlp.prefs = prefs.client;
 
         if (! hlp.meta) hlp.meta = {};
         if (! hlp.contents) hlp.contents = "";
@@ -175,7 +216,7 @@ var Util = {
         };
 
 
-        hlp.methods = mapMethods (
+        hlp.methods = mapMethods (//{{{
             src,
             hlp.methods,
             "(undocumented)",
@@ -185,9 +226,12 @@ var Util = {
                     implemented: implemented,
                 };
             }
-        );
+        );//}}}
 
-        hlp.examples = mapMethods (
+
+        propSet(hlp, "examples", propGet(prefs, "defaults.help.examples")); // Get defaults.
+
+        hlp.examples = mapMethods (//{{{
             src,
             hlp.examples,
             undefined,
@@ -222,7 +266,7 @@ var Util = {
                 };
                 return output;
             }
-        );
+        );//}}}
 
         return hlp;
     },//}}}

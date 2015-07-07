@@ -76,16 +76,15 @@ module.exports = function APIloader(api, Options) { //{{{
     // Create new router:
     var R = Express.Router();
     
+    var Prefs = Util.buildPrefs(Options);
+
     // Attach Promise Engine:
-    if (Options.promiseEngine) {
-        R.Promise = Options.promiseEngine;
+    if (Prefs.promiseEngine) {
+        R.Promise = Prefs.promiseEngine;
     } else if (! R.Promise) {
         R.Promise = require('promise');
     };
     
-    // Sanityze options:
-    if (Options === undefined) Options = {};
-
     var Tools = {
         exposeCallable: (function(){//{{{
 
@@ -102,7 +101,7 @@ module.exports = function APIloader(api, Options) { //{{{
                 };
             };//}}}
 
-            return function buildCallable(fName, handler, method, Options){ // Expose handler as callable function://{{{
+            return function buildCallable(fName, handler, method, Prefs){ // Expose handler as callable function://{{{
 
                 if (R.fn === undefined) {
                     R.fn = {};
@@ -118,7 +117,7 @@ module.exports = function APIloader(api, Options) { //{{{
                 R.syncFn[fName][method] = Util.depromise(R.fn[fName][method]);
 
                 // For all available filters:
-                if (! Options.noFilters) for (var ext in outputFilters) {
+                if (! Prefs.noFilters) for (var ext in outputFilters) {
                     if (R.fn[fName+"."+ext] === undefined) {
                         R.fn[fName+"."+ext] = {};
                         R.syncFn[fName+"."+ext] = {};
@@ -140,8 +139,8 @@ module.exports = function APIloader(api, Options) { //{{{
         rtPath = "/" + rtPath;               // Route base path.
 
         // Build help item route://{{{
-        if (! Options.noHelp) {
-            spc.help = Util.hlpAutocomplete(spc, rtPath);
+        if (! Prefs.noHelp) {
+            spc.help = Util.hlpAutocomplete(spc, rtPath, Prefs);
             (function (hlp) {
                 R.get(rtPath + "/help", function renderHelpItem(req, res, next) {
                     res.header("Content-Type", "text/html");
@@ -157,7 +156,7 @@ module.exports = function APIloader(api, Options) { //{{{
             if (rtHandler === undefined) return; // Avoid trying to map unspecified method handlers.
             //}}}
 
-            if (! Options.noLib) Tools.exposeCallable (fName, rtHandler, method, Options);
+            if (! Prefs.noLib) Tools.exposeCallable (fName, rtHandler, method, Prefs);
 
             // Pick appropriate input mapper://{{{
             var inputMapper = defaultRequestMapper;
@@ -181,7 +180,7 @@ module.exports = function APIloader(api, Options) { //{{{
             //}}}
 
             // Append routes for all available output filters://{{{
-            if (! Options.noFilters) for (var ext in outputFilters) {
+            if (! Prefs.noFilters) for (var ext in outputFilters) {
                 buildHandler(
                     R,
                     rtPath + "." + ext,
@@ -197,16 +196,17 @@ module.exports = function APIloader(api, Options) { //{{{
     };
 
     // Build help index route://{{{
-    if (! Options.noHelp) R.get("/help", function renderHelpIndex(req, res, next) {
+    if (! Prefs.noHelp) R.get("/help", function renderHelpIndex(req, res, next) {
         res.header("Content-Type", "text/html");
         res.send(Tpl.helpIndex({
             path: Path.dirname(req.uri.pathname),
+            prefs: Prefs.client,
             fn: Object.keys(api).map(function(rtPath){return api[rtPath].help;}),
         }));
     });//}}}
 
     // Shorthand for single-method functions://{{{
-    if (! Options.noLib) Object.keys(R.fn).filter(function(k){
+    if (! Prefs.noLib) Object.keys(R.fn).filter(function(k){
         var methods = Object.keys(R.fn[k]);
         if ( // Function has only one (get/post/.../all) method.
             methods.length === 1
