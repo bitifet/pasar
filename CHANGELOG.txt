@@ -1,9 +1,10 @@
 CHANGELOG.txt
 =============
 
-
+"version": "0.0.6",
     Tested and fixed syncFn (synchronous library access) capabilities.
     Let to use user specified Promise Engine thought Options.promiseEngine.
+    Added manual draft (doc/Manual.md).
 
 "version": "0.0.5",
     Added Options parameter and implemented some facility disabling functionalities.

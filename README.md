@@ -3,7 +3,7 @@ PASAR
 
 Promise Aware Smart API Rest builder.
 
-Let's to easily build Express routers with an Smart API REST facilites.
+Let's to easily build Express routers with an Smart API REST capabilities.
 
 <a name="features"></a>Features:
 --------------------------------
@@ -54,7 +54,7 @@ Let's to easily build Express routers with an Smart API REST facilites.
 <a name="documentation"></a>Documentation:
 ------------------------------------------
 
-Currently the only existing documentation consist in below [examples](examples)
+Currently the only existing documentation consist in below [examples](#examples) and an uncomplete [Usage Manual](doc/Manual.md).
 
 Maybe you would like to help in building better one... (see [Contributing](#contributing))
 
