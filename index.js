@@ -11,7 +11,6 @@
 "use strict";
 var Path = require("path");
 var Express = require("express");
-var Promise = require("promise");
 var Util = require("./util.js");
 var OutputFormatters = require("./formatters.js");
 var Cfg = require("./cfg.js");
@@ -71,58 +70,68 @@ function buildHandler(//{{{
     });
 };//}}}
 
-var exposeCallable = (function(){//{{{
-
-    function buildFunction (handler, filter) {//{{{
-        return function (input) {
-            return new Promise(function(resolve, reject){
-                handler.call(this, input)
-                    .then(function(result){
-                        resolve(filter(result));
-                    })
-                    .catch(reject)
-                ;
-            });
-        };
-    };//}}}
-
-    return function buildCallable(R, fName, handler, method, Options){ // Expose handler as callable function://{{{
-
-        if (R.fn === undefined) {
-            R.fn = {};
-            R.syncFn = {};
-        };
-
-        // With default output filter:
-        if (R.fn[fName] === undefined) {
-            R.fn[fName] = {};
-            R.syncFn[fName] = {};
-        };
-        R.fn[fName][method] = buildFunction(handler, outputFilters[Cfg.defaultOutputFilter]);
-        R.syncFn[fName][method] = Util.depromise(R.fn[fName][method]);
-
-        // For all available filters:
-        if (! Options.noFilters) for (var ext in outputFilters) {
-            if (R.fn[fName+"."+ext] === undefined) {
-                R.fn[fName+"."+ext] = {};
-                R.syncFn[fName+"."+ext] = {};
-            };
-            R.fn[fName+"."+ext][method] = buildFunction(handler, outputFilters[ext]);
-            R.syncFn[fName+"."+ext][method] = Util.depromise(R.fn[fName+"."+ext][method]);
-        };
-
-    }; //}}}
-
-})();//}}}
-
 
 module.exports = function APIloader(api, Options) { //{{{
 
     // Create new router:
     var R = Express.Router();
     
+    // Attach Promise Engine:
+    if (Options.promiseEngine) {
+        R.Promise = Options.promiseEngine;
+    } else if (! R.Promise) {
+        R.Promise = require('promise');
+    };
+    
     // Sanityze options:
     if (Options === undefined) Options = {};
+
+    var Tools = {
+        exposeCallable: (function(){//{{{
+
+            function buildFunction (handler, filter) {//{{{
+                return function (input) {
+                    return new R.Promise(function(resolve, reject){
+                        handler.call(this, input)
+                            .then(function(result){
+                                resolve(filter(result));
+                            })
+                            .catch(reject)
+                        ;
+                    });
+                };
+            };//}}}
+
+            return function buildCallable(fName, handler, method, Options){ // Expose handler as callable function://{{{
+
+                if (R.fn === undefined) {
+                    R.fn = {};
+                    R.syncFn = {};
+                };
+
+                // With default output filter:
+                if (R.fn[fName] === undefined) {
+                    R.fn[fName] = {};
+                    R.syncFn[fName] = {};
+                };
+                R.fn[fName][method] = buildFunction(handler, outputFilters[Cfg.defaultOutputFilter]);
+                R.syncFn[fName][method] = Util.depromise(R.fn[fName][method]);
+
+                // For all available filters:
+                if (! Options.noFilters) for (var ext in outputFilters) {
+                    if (R.fn[fName+"."+ext] === undefined) {
+                        R.fn[fName+"."+ext] = {};
+                        R.syncFn[fName+"."+ext] = {};
+                    };
+                    R.fn[fName+"."+ext][method] = buildFunction(handler, outputFilters[ext]);
+                    R.syncFn[fName+"."+ext][method] = Util.depromise(R.fn[fName+"."+ext][method]);
+                };
+
+            }; //}}}
+
+        })(),//}}}
+    };
+
 
     // Populate all specified routes:
     for (var rtPath in api) {
@@ -148,7 +157,7 @@ module.exports = function APIloader(api, Options) { //{{{
             if (rtHandler === undefined) return; // Avoid trying to map unspecified method handlers.
             //}}}
 
-            if (! Options.noLib) exposeCallable (R, fName, rtHandler, method, Options);
+            if (! Options.noLib) Tools.exposeCallable (fName, rtHandler, method, Options);
 
             // Pick appropriate input mapper://{{{
             var inputMapper = defaultRequestMapper;
@@ -211,6 +220,10 @@ module.exports = function APIloader(api, Options) { //{{{
             R.syncFn[k][mtd] = syncFn;
         };
     });//}}}
+
+
+    // Do some cleanup:
+    for (var i in Tools) delete Tools[i];
 
     return R;
 };//}}}

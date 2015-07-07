@@ -3,6 +3,7 @@ CHANGELOG.txt
 
 
     Tested and fixed syncFn (synchronous library access) capabilities.
+    Let to use user specified Promise Engine thought Options.promiseEngine.
 
 "version": "0.0.5",
     Added Options parameter and implemented some facility disabling functionalities.
