@@ -1,6 +1,9 @@
 CHANGELOG.txt
 =============
 
+
+    Tested and fixed syncFn (synchronous library access) capabilities.
+
 "version": "0.0.5",
     Added Options parameter and implemented some facility disabling functionalities.
     Implemented 'fn' vector to easily reuse API as a function library.

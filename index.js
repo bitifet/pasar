@@ -74,9 +74,9 @@ function buildHandler(//{{{
 var exposeCallable = (function(){//{{{
 
     function buildFunction (handler, filter) {//{{{
-        return function () {
+        return function (input) {
             return new Promise(function(resolve, reject){
-                handler.apply(this, arguments)
+                handler.call(this, input)
                     .then(function(result){
                         resolve(filter(result));
                     })
@@ -99,7 +99,7 @@ var exposeCallable = (function(){//{{{
             R.syncFn[fName] = {};
         };
         R.fn[fName][method] = buildFunction(handler, outputFilters[Cfg.defaultOutputFilter]);
-        R.syncFn[fName][method] = Util.deasync (R.fn[fName][method]);
+        R.syncFn[fName][method] = Util.depromise(R.fn[fName][method]);
 
         // For all available filters:
         if (! Options.noFilters) for (var ext in outputFilters) {
@@ -108,11 +108,10 @@ var exposeCallable = (function(){//{{{
                 R.syncFn[fName+"."+ext] = {};
             };
             R.fn[fName+"."+ext][method] = buildFunction(handler, outputFilters[ext]);
-            R.syncFn[fName+"."+ext][method] = Util.deasync(R.fn[fName+"."+ext][method]);
+            R.syncFn[fName+"."+ext][method] = Util.depromise(R.fn[fName+"."+ext][method]);
         };
 
     }; //}}}
-
 
 })();//}}}
 

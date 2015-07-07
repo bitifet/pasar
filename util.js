@@ -89,6 +89,15 @@ function mapMethods (//{{{
 
 };//}}}
 
+var deasync = (function(){//{{{
+    var requiredVersion = "v0.11.0";
+    if (versionCheck(requiredVersion)) return require("deasync");
+    return function noobDeasync(){
+        return function(){
+            throw "Sync functions are not supported in node versions earlier than " + requiredVersion;
+        };
+    };
+})();//}}}
 
 var Util = {
     tpl: function tplCompile(tplPath) {//{{{
@@ -224,15 +233,22 @@ var Util = {
             return res.status(Cfg.statIdx.error).send("Internal Server Error");
         } else return res.status(st).send(msg);
     },//}}}
-    deasync: (function(){//{{{
-        var requiredVersion = "v0.11.0";
-        if (versionCheck(requiredVersion)) return require("deasync");
-        return function noobDeasync(){
-            return function(){
-                throw "Sync functions are not supported in node versions earlier than " + requiredVersion;
+    depromise: function deasyncPromise(p) { //{{{
+        return deasync(function (input, cbk) {
+            if (typeof input == "function" && (cbk === undefined)) {
+                cbk = input;
+                input = {};
             };
-        };
-    })(),//}}}
+            p(input)
+                .then(function(output){
+                    cbk(false, output);
+                })
+                .catch(function(err){
+                    cbk(err);
+                })
+            ;
+        });
+    },//}}}
 };
 
 module.exports=Util;

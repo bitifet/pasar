@@ -36,7 +36,6 @@ Let's to easily build Express routers with an Smart API REST facilites.
     - This enables you to reuse simple functionalities as sync functions.
     - But be carefull, that THOSE ARE BLOCKING FUNCTIONS. So use at your own risk.
     - Available only for Node version v0.11.0 or hihger.
-    - FIXME: Untested (I'm currently developing on Node v0.10.25) so it could not work at all.
 
   * More comming... (see [TODO](#TODO) )
 
