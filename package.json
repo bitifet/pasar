@@ -1,6 +1,6 @@
 {
   "name": "pasar",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Promise Aware Smart API REST builder to easily implement Express routers with advanced capabilities.",
   "main": "index.js",
   "scripts": {

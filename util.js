@@ -120,11 +120,22 @@ function propGet(target, path) {//{{{
     } else return target[prop];
 };//}}}
 
+function propExpand(target) {//{{{
+    for (var i in target) {
+        if (i.match(/\./)) {
+            propSet(target, i, target[i]);
+            delete target[i];
+        } else {
+            if (typeof target[i] == "object") propExpand(target);
+        };
+    };
+};//}}}
 
 var Util = {
     buildPrefs: function applyDefaultPreferences(Options) {//{{{
 
         var prefs = {};
+        propExpand(Options);
 
         // Sanityze options:
         if (Options === undefined) Options = {};

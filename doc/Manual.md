@@ -88,6 +88,31 @@ FIXME
 <a name="apiOptions"></a>Api Options
 ------------------------------------
 
+Options object serves to modify PASAR default's behaviour in multiple manner.
+
+NOTE: It is a multidimensional object. But sometimes you could only need to set one specific inner value in a more complex structure. To achieve this, you could use abbreviated "dotted" syntax for Options object keys. For example:
+
+    var Options = {
+        "defaults.help.examples.get": [{}],
+        "defaults.help.examples.post": [["Post with test=true", {test: true}]],
+    };
+
+...will become to:
+
+    var Options = {
+        defaults: {
+            help: {
+                examples: {
+                    get: [{}],
+                    post: [["Post with test=true", {test: true}]],
+                }
+            }
+        }
+    };
+
+
+###<a name="optDisabling"></a>Feature-disabling Options:
+
 noLib (boolean, default = false)
 : Disables .fn and .syncFn facilites.
 
@@ -97,14 +122,28 @@ noHelp (boolean, default = false)
 noFilters (boolean, default = false)
 : Disables optional formatting filters.
 
+
+###<a name="optDefaults"></a>"defaults" Option:
+
+"defaults" Option let's define default values to be merged with all API function definiton.
+
+Not fully functional yet. But let's define defaults.help.examples.get as ``[{}]``.
+
+
+###<a name="optClient"></a>"client" Option:
+
+"client" option let's to override some client-side preferences used by special views templates (like help or form views).
+
+Current available client's optins are:
+
+jQuery
+: Defaults to googleApis jQuery path. But you may want to override it if you haven't Internet access or prefer to serve your own stored copy.
+
+
+###<a name="optMisc"></a>Miscellaneous Options:
+
 promiseEngine
 : Let's to provide your own Promise engine.
-
-defaults
-: Let's define default values to be merged with all API function definiton. Not fully functional yet. But let's define defaults.help.examples as ``"{get: [{}]}"``.
-
-client
-: Client preferences (passed as 'prefs') to all special views templates (like help or form views). Can have some predefined values, like jQuery (client.jQuery) providding path to that javascript client library.
 
 
 <a name="advFeatures"></a>Advanced Features

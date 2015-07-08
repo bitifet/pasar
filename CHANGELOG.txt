@@ -1,8 +1,11 @@
 CHANGELOG.txt
 =============
 
+"version": "0.0.7",
     Overridable default preferences (thought Options object).
     Client-side preferences like jQuery path to be used in help and form views.
+    Shorthand for partial multidimensional Options. I.e: «"foo.bar.baz": "value"» standing for «foo:{bar:{baz:"value"}}»
+    Updated doc/Manual.md
 
 "version": "0.0.6",
     Tested and fixed syncFn (synchronous library access) capabilities.
