@@ -45,10 +45,44 @@ Let's to easily build Express routers with an Smart API REST capabilities.
 <a name="advFeatures"></a>Advanced Features:
 --------------------------------------------
 
-  * Custom input mapping:
+  * Custom request mapping:
     - Method handler input is, by default, JSON which is mapped thought predefined callback.
     - You can specify your own one customized for specific or 'all' methods.
-    - Example: input: {get: function(request, method){return request.body;}} // Same as default.
+    - Example:
+
+
+    requestHandler: {
+        get: function(request, method){ // Emulate default request mapper.
+                 return request.body;
+        }
+    }
+
+  * Custom response mapping:
+    - Method handler output is always expected to be a promise of object containing actual result.
+    - This result is redirected to http response by default thought predefined response mapping callback.
+    - You can specify your own one customized for specific or 'all' methods.
+    - Example:
+
+
+    responseHandler: { // Emulate default response mapper:
+        all: function defaultResponseMapper ( // Overridable thought "responseMapper".
+                p,              // Result promise returned from our API function handler.
+                outputFilter,   // Formatting filter to be applyed.
+                res,            // HTTP Response object. (Express)
+                next            // HTTP Next() function. (Express)
+            ) {
+                p.then(function(data){
+                    var result = outputFilter(data);
+                    res.header("Content-Type", result.ctype);
+                    res.send(result.data);
+                })
+                .catch(function(err){
+                    Util.sendStatusMessage(res, 'error', err.toString());
+                });
+            },
+        }
+    },
+
 
 
 <a name="documentation"></a>Documentation:
@@ -74,6 +108,8 @@ All API definitions should look's like follows:
         // noLib: true,     // Comment-out to disable .fn and .syncFn facilites.
         // noHelp: true,    // Comment-out to disable /help facilities.
         // noFilters: true, // Comment-out to disable optional formatting filters.
+        // "defaults.help.examples.get": [{}], // Comment-out to automatically provide all your functions help with simple example.
+        // promiseEngine: myPromiseEngine, // Comment-out to provide your own promise engine.
     };
 
     var myApi = {

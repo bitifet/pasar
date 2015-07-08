@@ -20,9 +20,30 @@ var Tpl = {
     helpItem: Util.tpl("helpItem.jade"),
 };
 
-function defaultRequestMapper (req, method) {//{{{
+function defaultRequestMapper ( // Overridable thought "requestMapper". //{{{
+    req,    // HTTP Request object. (Express)
+    method  // Actual method name.
+) {
+    // Input for our API function handler.
     return req.body;
 };//}}}
+
+function defaultResponseMapper ( // Overridable thought "responseMapper". //{{{
+    p,              // Result promise returned from our API function handler.
+    outputFilter,   // Formatting filter to be applyed.
+    res,            // HTTP Response object. (Express)
+    next            // HTTP Next() function. (Express)
+) {
+    p.then(function(data){
+        var result = outputFilter(data);
+        res.header("Content-Type", result.ctype);
+        res.send(result.data);
+    })
+    .catch(function(err){
+        Util.sendStatusMessage(res, 'error', err.toString());
+    });
+};//}}}
+
 
 var outputFilters = (//{{{
     function (src) { // Wrap common input checkins wrapping:
@@ -48,27 +69,6 @@ var outputFilters = (//{{{
     }
 )(OutputFormatters);//}}}
 
-function buildHandler(//{{{
-        router,
-        pathSpec,
-        method,
-        ctrl,
-        inputMapper,
-        outputMapper
-) {
-    router[method](pathSpec, function (req,res,next) {
-        var p = ctrl(
-            inputMapper(req, method)
-        ).then(function(data){
-            var result = outputMapper(data);
-            res.header("Content-Type", result.ctype);
-            res.send(result.data);
-        })
-        .catch(function(err){
-            Util.sendStatusMessage(res, 'error', err.toString());
-        });
-    });
-};//}}}
 
 
 module.exports = function APIloader(api, Options) { //{{{
@@ -158,35 +158,50 @@ module.exports = function APIloader(api, Options) { //{{{
 
             if (! Prefs.noLib) Tools.exposeCallable (fName, rtHandler, method, Prefs);
 
-            // Pick appropriate input mapper://{{{
-            var inputMapper = defaultRequestMapper;
-            if (spc.input !== undefined) {
-                if (spc.input[method] !== undefined) {
-                    inputMapper = spc.input[method];
-                } else if (spc.input.all !== undefined) {
-                    inputMapper = spc.input.all;
+            // Pick appropriate request and response mappers://{{{
+
+            var requestMapper = defaultRequestMapper; // Default.
+            var responseMapper = defaultResponseMapper; // Default.
+
+            if (spc.requestMapper !== undefined) {
+                if (spc.requestMapper[method] !== undefined) {
+                    requestMapper = spc.requestMapper[method];
+                } else if (spc.requestMapper.all !== undefined) {
+                    requestMapper = spc.requestMapper.all;
                 };
-            };//}}}
+            };
+
+            if (spc.responseMapper !== undefined) {
+                if (spc.responseMapper[method] !== undefined) {
+                    responseMapper = spc.responseMapper[method];
+                } else if (spc.responseMapper.all !== undefined) {
+                    responseMapper = spc.responseMapper.all;
+                };
+            };
+            
+            //}}}
 
             // Append main route://{{{
-            buildHandler(
+            Util.buildHandler(
                 R,
                 rtPath,
                 method,
                 rtHandler,
-                inputMapper,
+                requestMapper,
+                responseMapper,
                 outputFilters[Cfg.defaultOutputFilter]
             );
             //}}}
 
             // Append routes for all available output filters://{{{
             if (! Prefs.noFilters) for (var ext in outputFilters) {
-                buildHandler(
+                Util.buildHandler(
                     R,
                     rtPath + "." + ext,
                     method,
                     rtHandler,
-                    inputMapper,
+                    requestMapper,
+                    responseMapper,
                     outputFilters[ext]
                 );
             };//}}}

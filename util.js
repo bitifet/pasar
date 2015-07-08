@@ -198,6 +198,27 @@ var Util = {
       return (str + '')
         .replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1' + breakTag + '$2');
     },//}}}
+    buildHandler: function buildHandler(//{{{
+            router,         // Router.
+            pathSpec,       // Route path.
+            method,         // Method name or "all".
+            ctrl,           // Our actual functionality implementation returning promise.
+            requestMapper,  // Request handler to obtain input object.
+            responseMapper, // Response handler to serve returning data.
+            outputFilter    // Output formatter.
+    ) {
+        router[method](pathSpec, function (req,res,next) {
+            responseMapper(
+                ctrl(
+                    requestMapper(req, method) // Our function input data.
+                )
+                , outputFilter
+                , res
+                , next
+            );
+        });
+
+    },//}}}
     hlpAutocomplete: function hlpAutocompleter(src, fnPath, prefs) {//{{{
         var hlp = src.help;
 
