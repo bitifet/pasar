@@ -4,6 +4,7 @@ CHANGELOG.txt
 
     Clearer namming for request, response mappers and output formatter.
     Implemented authentication handling facilities.
+    Small project modularization.
 
 "version": "0.0.7",
     Overridable default preferences (thought Options object).

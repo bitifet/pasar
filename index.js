@@ -11,8 +11,7 @@
 "use strict";
 var Path = require("path");
 var Express = require("express");
-var Util = require("./util.js");
-var OutputFormatters = require("./formatters.js");
+var Util = require("./lib/util.js");
 var Cfg = require("./cfg.js");
 
 var Tpl = {
@@ -20,47 +19,10 @@ var Tpl = {
     helpItem: Util.tpl("helpItem.jade"),
 };
 
-function defaultRequestMapper ( // Overridable thought "requestMapper". //{{{
-    req,    // HTTP Request object. (Express)
-    method  // Actual method name.
-) {
-    // Input for our API function handler.
-    return req.body;
-};//}}}
+var defaultRequestMapper = require("./lib/defaultRequestMapper.js");
+var defaultResponseMapper = require("./lib/defaultResponseMapper.js");
+var defaultAuthHandler = require("./lib/defaultAuthHandler.js");
 
-function defaultResponseMapper ( // Overridable thought "responseMapper". //{{{
-    p,              // Result promise returned from our API function handler.
-    outputFilter,   // Formatting filter to be applyed.
-    res,            // HTTP Response object. (Express)
-    next            // HTTP Next() function. (Express)
-) {
-    p.then(function(data){
-        var result = outputFilter(data);
-        res.header("Content-Type", result.ctype);
-        res.send(result.data);
-    })
-    .catch(function(err){
-        Util.sendStatusMessage(res, 'error', err.toString());
-    });
-};//}}}
-
-var defaultAuthHandler = (function(){//{{{
-    var defOutputFilter = function(input){return input;}; // No filtering peformed by default.
-    var defCheckPrivileges = function(){return {};};
-    return function defaultAuthHandler (
-        method,
-        pathSpec,
-        req,
-        res,
-        next
-    ) {
-        return {
-            filter: defOutputFilter,
-            userData: {}, // User data to be provided to each controller.
-            privileges: defCheckPrivileges,
-        };
-    };
-})();//}}}
 
 var outputFilters = (//{{{
     function (src) { // Wrap common input checkins wrapping:
@@ -84,7 +46,7 @@ var outputFilters = (//{{{
         });
         return flt;
     }
-)(OutputFormatters);//}}}
+)(require("./lib/formatters.js"));//}}}
 
 
 module.exports = function APIloader(api, Options) { //{{{
