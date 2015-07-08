@@ -44,6 +44,23 @@ function defaultResponseMapper ( // Overridable thought "responseMapper". //{{{
     });
 };//}}}
 
+var defaultAuthHandler = (function(){//{{{
+    var defOutputFilter = function(input){return input;}; // No filtering peformed by default.
+    var defCheckPrivileges = function(){return {};};
+    return function defaultAuthHandler (
+        method,
+        pathSpec,
+        req,
+        res,
+        next
+    ) {
+        return {
+            filter: defOutputFilter,
+            userData: {}, // User data to be provided to each controller.
+            privileges: defCheckPrivileges,
+        };
+    };
+})();//}}}
 
 var outputFilters = (//{{{
     function (src) { // Wrap common input checkins wrapping:
@@ -68,7 +85,6 @@ var outputFilters = (//{{{
         return flt;
     }
 )(OutputFormatters);//}}}
-
 
 
 module.exports = function APIloader(api, Options) { //{{{
@@ -160,8 +176,9 @@ module.exports = function APIloader(api, Options) { //{{{
 
             // Pick appropriate request and response mappers://{{{
 
-            var requestMapper = defaultRequestMapper; // Default.
+            var requestMapper = defaultRequestMapper;   // Default.
             var responseMapper = defaultResponseMapper; // Default.
+            var authHandler = defaultAuthHandler;       // Default.
 
             if (spc.requestMapper !== undefined) {
                 if (spc.requestMapper[method] !== undefined) {
@@ -179,30 +196,40 @@ module.exports = function APIloader(api, Options) { //{{{
                 };
             };
             
+            if (spc.authHandler !== undefined) {
+                if (spc.authHandler[method] !== undefined) {
+                    authHandler = spc.authHandler[method];
+                } else if (spc.authHandler.all !== undefined) {
+                    authHandler = spc.authHandler.all;
+                };
+            };
+
             //}}}
 
             // Append main route://{{{
             Util.buildHandler(
-                R,
-                rtPath,
-                method,
-                rtHandler,
-                requestMapper,
-                responseMapper,
-                outputFilters[Cfg.defaultOutputFilter]
+                R
+                , rtPath
+                , method
+                , rtHandler
+                , requestMapper
+                , responseMapper
+                , outputFilters[Cfg.defaultOutputFilter]
+                , authHandler
             );
             //}}}
 
             // Append routes for all available output filters://{{{
             if (! Prefs.noFilters) for (var ext in outputFilters) {
                 Util.buildHandler(
-                    R,
-                    rtPath + "." + ext,
-                    method,
-                    rtHandler,
-                    requestMapper,
-                    responseMapper,
-                    outputFilters[ext]
+                    R
+                    , rtPath + "." + ext
+                    , method
+                    , rtHandler
+                    , requestMapper
+                    , responseMapper
+                    , outputFilters[ext]
+                    , authHandler
                 );
             };//}}}
 

@@ -1,6 +1,10 @@
 CHANGELOG.txt
 =============
 
+
+    Clearer namming for request, response mappers and output formatter.
+    Implemented authentication handling facilities.
+
 "version": "0.0.7",
     Overridable default preferences (thought Options object).
     Client-side preferences like jQuery path to be used in help and form views.

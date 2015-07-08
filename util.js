@@ -199,20 +199,56 @@ var Util = {
         .replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1' + breakTag + '$2');
     },//}}}
     buildHandler: function buildHandler(//{{{
-            router,         // Router.
-            pathSpec,       // Route path.
-            method,         // Method name or "all".
-            ctrl,           // Our actual functionality implementation returning promise.
-            requestMapper,  // Request handler to obtain input object.
-            responseMapper, // Response handler to serve returning data.
-            outputFilter    // Output formatter.
+            router          // Router.
+            , pathSpec       // Route path.
+            , method         // Method name or "all".
+            , ctrl           // Our actual functionality implementation returning promise.
+            , requestMapper  // Request handler to obtain input object.
+            , responseMapper // Response handler to serve returning data.
+            , outputFilter   // Output formatter.
+            , authHandler    // Authentication handler.
     ) {
         router[method](pathSpec, function (req,res,next) {
+
+            // Authentication handling.//{{{
+            var auth = authHandler(
+                method,
+                pathSpec,
+                req,
+                res,
+                next
+            );
+
+            // Access control:
+            if (! auth) return;
+            // WARNING: authHandler is responsible to hanle response
+            // sending 404, 501, etc... status messages or redirecting
+            // to other route when user is fully unauthorized (auth is falsy).
+
+            // Authentication data to be passed to our controller.
+            var authData = {
+                userData: auth.userData,     // Let controller to know user info.
+                                             //     ...for example to customize its response.
+                                             //     this makes possible to easily implement
+                                             //     user-customized routes like '/myProfile'.
+                privileges: auth.privileges, // (function) Let controller to ask for user privileges.
+                                             //     authHandler is able to provide generic implementation
+                                             //     returning free-formatted list of privileges
+                                             //     or more powerful interface to ask for specific
+                                             //     privileges (this is ato your own discretion).
+
+            };//}}}
+
             responseMapper(
                 ctrl(
                     requestMapper(req, method) // Our function input data.
+                    , authData
                 )
-                , outputFilter
+                , function fullOutputFilter(input) {
+                    return outputFilter(   // Formatting filter.
+                        auth.filter(input) // Authentication filter.
+                    );
+                }
                 , res
                 , next
             );
