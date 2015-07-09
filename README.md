@@ -13,8 +13,7 @@ Let's to easily build Express routers with an Smart API REST capabilities.
   * Multiple output formats selected by extension (default is .json). Including html (to easy data inspection).
     - .json
     - .html
-    - .csv
-    - (more comming soon...)
+    - (.csv and more comming soon...)
 
   * Easy access to self explanation (adding '/help' to each url) and fully automated help index.
     - As simple as supplying single help string.
@@ -22,6 +21,12 @@ Let's to easily build Express routers with an Smart API REST capabilities.
     - Ability to enable examples to be directly triggered from help page (easy checking).
     - Always list all implemented methods even undocumented and, if documented, also unimplemented ones marking them as "undocumented".
     - Fully automated help index (on root's /help) even for undocumented functions.
+
+  * Consistent routing schema:
+    - /myRoute -> Default output (JSON) of your function handler.
+    - /myRoute.ext -> Export to "ext" format thought provided output format filters.
+    - /myRoute/facilityName -> Access to specified facility (/help, /form...)
+    - /facilityName -> Access to specified facility index (if applies).
 
   * Internally reusable: API function implementation can easily make use of other functions.
     - Method handlers receive JSON object with request parameters NOT request, nor response or next express objects.
@@ -45,17 +50,22 @@ Let's to easily build Express routers with an Smart API REST capabilities.
 <a name="advFeatures"></a>Advanced Features:
 --------------------------------------------
 
+  * Advanced access control handling:
+    - NOT authentication itself.
+    - .... FIXME
+
+
+
   * Custom request mapping:
     - Method handler input is, by default, JSON which is mapped thought predefined callback.
     - You can specify your own one customized for specific or 'all' methods.
     - Example:
 
 
-    requestHandler: {
-        get: function(request, method){ // Emulate default request mapper.
-                 return request.body;
-        }
-    }
+    requestMapper: myRequestMapper,
+
+
+...for more details about how to implement your own request mapper, see [default Request Mapper implementation](lib/defaultRequestMapper.js).
 
   * Custom response mapping:
     - Method handler output is always expected to be a promise of object containing actual result.
@@ -64,24 +74,10 @@ Let's to easily build Express routers with an Smart API REST capabilities.
     - Example:
 
 
-    responseHandler: { // Emulate default response mapper:
-        all: function defaultResponseMapper ( // Overridable thought "responseMapper".
-                p,              // Result promise returned from our API function handler.
-                outputFilter,   // Formatting filter to be applyed.
-                res,            // HTTP Response object. (Express)
-                next            // HTTP Next() function. (Express)
-            ) {
-                p.then(function(data){
-                    var result = outputFilter(data);
-                    res.header("Content-Type", result.ctype);
-                    res.send(result.data);
-                })
-                .catch(function(err){
-                    Util.sendStatusMessage(res, 'error', err.toString());
-                });
-            },
-        }
-    },
+    responseMapper: myResponseMapper,
+
+...for more details about how to implement your own response mapper, see [default Response Mapper implementation](lib/defaultResponseMapper.js).
+
 
 
 

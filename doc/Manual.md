@@ -152,6 +152,10 @@ promiseEngine
 FIXME
 
 
+###<a name="auth"></a>Authentication handling
+
+FIXME
+
 
 ###<a name="fn"></a>Local library function access (Promises): fn
 
