@@ -21,33 +21,13 @@ var Tpl = {
 
 var defaultRequestMapper = require("./lib/defaultRequestMapper.js");
 var defaultResponseMapper = require("./lib/defaultResponseMapper.js");
-var defaultAuthHandler = require("./lib/defaultAuthHandler.js");
+var Auth = require("./lib/auth.js");
 
+var exportFilters = require("./lib/formatters.js");
 
-var outputFilters = (//{{{
-    function (src) { // Wrap common input checkins wrapping:
-        var flt = {};
-        Object.keys(src).map(function wrapFixations(fltName) {
-            flt[fltName] = function(input) {
-                var output = {};
-                if (input !== undefined) {
-                    if (input.data === undefined) {
-                        // Accept result without data/metadata separation when
-                        // there is no metadata to pass thought.
-                        // (Only if no data vector present)
-                        output.data = input;
-                    } else {
-                        output = input;
-                    };
-                    if (output.meta === undefined) output.meta = {};
-                };
-                return src[fltName](output);
-            };
-        });
-        return flt;
-    }
-)(require("./lib/formatters.js"));//}}}
-
+function functionDuck(duck) {
+    return typeof duck == "function";
+};
 
 module.exports = function APIloader(api, Options) { //{{{
 
@@ -91,16 +71,16 @@ module.exports = function APIloader(api, Options) { //{{{
                     R.fn[fName] = {};
                     R.syncFn[fName] = {};
                 };
-                R.fn[fName][method] = buildFunction(handler, outputFilters[Cfg.defaultOutputFilter]);
+                R.fn[fName][method] = buildFunction(handler, exportFilters[Cfg.defaultOutputFilter]);
                 R.syncFn[fName][method] = Util.depromise(R.fn[fName][method]);
 
                 // For all available filters:
-                if (! Prefs.noFilters) for (var ext in outputFilters) {
+                if (! Prefs.noFilters) for (var ext in exportFilters) {
                     if (R.fn[fName+"."+ext] === undefined) {
                         R.fn[fName+"."+ext] = {};
                         R.syncFn[fName+"."+ext] = {};
                     };
-                    R.fn[fName+"."+ext][method] = buildFunction(handler, outputFilters[ext]);
+                    R.fn[fName+"."+ext][method] = buildFunction(handler, exportFilters[ext]);
                     R.syncFn[fName+"."+ext][method] = Util.depromise(R.fn[fName+"."+ext][method]);
                 };
 
@@ -136,62 +116,63 @@ module.exports = function APIloader(api, Options) { //{{{
 
             if (! Prefs.noLib) Tools.exposeCallable (fName, rtHandler, method, Prefs);
 
-            // Pick appropriate request and response mappers://{{{
+            var requestMapper = Util.pick([//{{{
+                [spc.requestMapper, method],
+                [spc.requestMapper, "all"],
+                [spc.requestMapper],
+                [Prefs.defaults, "requestMapper."+method],
+                [Prefs.defaults, "requestMapper.all"],
+                [Prefs.defaults, "requestMapper"],
+                [defaultRequestMapper] // Default.
+            ], functionDuck);//}}}
 
-            var requestMapper = defaultRequestMapper;   // Default.
-            var responseMapper = defaultResponseMapper; // Default.
-            var authHandler = defaultAuthHandler;       // Default.
-
-            if (spc.requestMapper !== undefined) {
-                if (spc.requestMapper[method] !== undefined) {
-                    requestMapper = spc.requestMapper[method];
-                } else if (spc.requestMapper.all !== undefined) {
-                    requestMapper = spc.requestMapper.all;
-                };
-            };
-
-            if (spc.responseMapper !== undefined) {
-                if (spc.responseMapper[method] !== undefined) {
-                    responseMapper = spc.responseMapper[method];
-                } else if (spc.responseMapper.all !== undefined) {
-                    responseMapper = spc.responseMapper.all;
-                };
-            };
+            var responseMapper = Util.pick([//{{{
+                [spc.responseMapper, method],
+                [spc.responseMapper, "all"],
+                [spc.responseMapper],
+                [Prefs.defaults, "responseMapper."+method],
+                [Prefs.defaults, "responseMapper.all"],
+                [Prefs.defaults, "responseMapper"],
+                [defaultResponseMapper] // Default.
+            ], functionDuck);//}}}
             
-            if (spc.authHandler !== undefined) {
-                if (spc.authHandler[method] !== undefined) {
-                    authHandler = spc.authHandler[method];
-                } else if (spc.authHandler.all !== undefined) {
-                    authHandler = spc.authHandler.all;
-                };
-            };
+            var authHandler = Util.pick([//{{{
+                [spc.authHandler, method],
+                [spc.authHandler, "all"],
+                [spc.authHandler],
+                [Prefs.defaults, "authHandler."+method],
+                [Prefs.defaults, "authHandler.all"],
+                [Prefs.defaults, "authHandler"],
+                [Auth.defaultHandler] // Default.
+            ], functionDuck);//}}}
 
-            //}}}
 
             // Append main route://{{{
             Util.buildHandler(
                 R
                 , rtPath
+                , null
                 , method
                 , rtHandler
                 , requestMapper
                 , responseMapper
-                , outputFilters[Cfg.defaultOutputFilter]
                 , authHandler
+                , spc.ac
             );
             //}}}
 
             // Append routes for all available output filters://{{{
-            if (! Prefs.noFilters) for (var ext in outputFilters) {
+            if (! Prefs.noFilters) for (var ext in exportFilters) {
                 Util.buildHandler(
                     R
-                    , rtPath + "." + ext
+                    , rtPath
+                    , ext
                     , method
                     , rtHandler
                     , requestMapper
                     , responseMapper
-                    , outputFilters[ext]
                     , authHandler
+                    , spc.ac
                 );
             };//}}}
 

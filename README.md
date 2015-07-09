@@ -25,8 +25,10 @@ Let's to easily build Express routers with an Smart API REST capabilities.
   * Consistent routing schema:
     - /myRoute -> Default output (JSON) of your function handler.
     - /myRoute.ext -> Export to "ext" format thought provided output format filters.
-    - /myRoute/facilityName -> Access to specified facility (/help, /form...)
-    - /facilityName -> Access to specified facility index (if applies).
+    - /myRoute/facilityName -> Access to specified facility (/help, /form /test...)
+    - /facilityName -> Access to specified facility index (if applies). For example:
+        - /help: Help index.
+        - /test: Run all tests (not yet implemented).
 
   * Internally reusable: API function implementation can easily make use of other functions.
     - Method handlers receive JSON object with request parameters NOT request, nor response or next express objects.
@@ -235,7 +237,9 @@ Then, to mount your API REST to your Express router simply:
 <a name="TODO"></a> TODO:
 -------------------------
 
-  * Easy testing witn automated (but customizable) '/form' views.
+  * Easy querying while developing with automated (but customizable) '/form' facilities.
+
+  * Posibility to execute predefined tests clientside thought /test facilities.
 
   * Global access control policies, including restriction to some functionalities like /help, etc...
 
