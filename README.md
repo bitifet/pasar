@@ -44,6 +44,8 @@ Let's to easily build Express routers with an Smart API REST capabilities.
     - But be carefull, that THOSE ARE BLOCKING FUNCTIONS. So use at your own risk.
     - Available only for Node version v0.11.0 or hihger.
 
+  * Global access control policies, including restriction to some functionalities like /help, etc...
+
   * More comming... (see [TODO](#TODO) )
 
   * For latest changes see: [CHANGELOG](CHANGELOG.txt)
@@ -102,12 +104,12 @@ All API definitions should look's like follows:
     var Promise = require("promise"); // Or your favorite promise library.
     var Pasar = require("pasar");
 
-    var Options = {
-        // noLib: true,     // Comment-out to disable .fn and .syncFn facilites.
-        // noHelp: true,    // Comment-out to disable /help facilities.
-        // noFilters: true, // Comment-out to disable optional formatting filters.
-        // "defaults.help.examples.get": [{}], // Comment-out to automatically provide all your functions help with simple example.
-        // promiseEngine: myPromiseEngine, // Comment-out to provide your own promise engine.
+    var Options = { // Comment-out / modify as you need...
+        // noLib: true,     // ...to disable .fn and .syncFn facilites.
+        // noHelp: true,    // ...to disable /help facilities.
+        // noFilters: true, // ...to disable optional formatting filters.
+        // "defaults.help.examples.get": [{}], // ...to automatically provide all your functions help with simple example.
+        // promiseEngine: myPromiseEngine, // ...to provide your own promise engine.
     };
 
     var myApi = {
@@ -240,8 +242,6 @@ Then, to mount your API REST to your Express router simply:
   * Easy querying while developing with automated (but customizable) '/form' facilities.
 
   * Posibility to execute predefined tests clientside thought /test facilities.
-
-  * Global access control policies, including restriction to some functionalities like /help, etc...
 
   * Configurable logging capabilites (including time measurement).
 

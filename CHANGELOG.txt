@@ -1,11 +1,13 @@
 CHANGELOG.txt
 =============
 
-
+"version": "0.0.8",
     Clearer namming for request, response mappers and output formatter.
     Implemented authentication handling facilities.
     Small project modularization.
     Updated and fixed (.csv is not yet implemented!) README.md.
+    Extended buildHandler() to also manage facilities in a consistent behaviour.
+    Other minor changes.
 
 "version": "0.0.7",
     Overridable default preferences (thought Options object).
@@ -36,7 +38,7 @@ CHANGELOG.txt
     Jade templating for help pages and minor fixes.
 
 "version": "0.0.1",
-    Changed "generator" for "builder" in to avoid confussion with ES_6 generators.
+    Changed "generator" for "builder" in README.md to avoid confussion with ES_6 generators.
     Minor fixes.
     Also fixed license version.
 

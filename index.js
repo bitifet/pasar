@@ -99,12 +99,34 @@ module.exports = function APIloader(api, Options) { //{{{
         // Build help item route://{{{
         if (! Prefs.noHelp) {
             spc.help = Util.hlpAutocomplete(spc, rtPath, Prefs);
-            (function (hlp) {
-                R.get(rtPath + "/help", function renderHelpItem(req, res, next) {
+
+            Util.buildHandler(
+                // Using buildHandler ensures consistent behaviour.
+                R
+                , rtPath + "/help"
+                , Tpl.helpItem      // Directly injected Output formatter.
+                , '/help'           // Facility name.
+                , spc.help          // Actual input.
+                , null              // No request handler.
+                , function(input , outputFilter , res , next) {
                     res.header("Content-Type", "text/html");
-                    res.send(Tpl.helpItem(hlp));
-                });
-            })(spc.help);
+                    res.send(outputFilter(input));
+                }
+                , Util.pick([ // Authentication Handler. //{{{
+                    [spc.authHandler, "all"],
+                    [spc.authHandler],
+                    [Prefs.defaults, "authHandler.all"],
+                    [Prefs.defaults, "authHandler"],
+                    [Auth.defaultHandler] // Default.
+                ], functionDuck)//}}}
+                , Util.pick([ // Access Control properties. //{{{
+                    [spc.ac],
+                    [Prefs.ac],
+                    {}
+                ], functionDuck)//}}}
+                , spc.ac                // Access Control data (from specification).
+            );
+
         };//}}}
 
         Cfg.validMethods.map(function(method){
@@ -181,14 +203,38 @@ module.exports = function APIloader(api, Options) { //{{{
     };
 
     // Build help index route://{{{
-    if (! Prefs.noHelp) R.get("/help", function renderHelpIndex(req, res, next) {
-        res.header("Content-Type", "text/html");
-        res.send(Tpl.helpIndex({
-            path: Path.dirname(req.uri.pathname),
-            prefs: Prefs.client,
-            fn: Object.keys(api).map(function(rtPath){return api[rtPath].help;}),
-        }));
-    });//}}}
+    if (! Prefs.noHelp) {
+        Util.buildHandler(
+            // Using buildHandler ensures consistent behaviour.
+            R
+            , "/help"
+            , Tpl.helpIndex     // Directly injected Output formatter.
+            , '/help'           // Facility name.
+            , function (input) {return input;}
+            , function(req, method) {
+                return {
+                    path: Path.dirname(req.uri.pathname),
+                    prefs: Prefs.client,
+                    fn: Object.keys(api).map(function(rtPath){return api[rtPath].help;}),
+                };
+            }
+            , function(input , outputFilter , res , next) {
+                res.header("Content-Type", "text/html");
+                res.send(outputFilter(input));
+            }
+            , Util.pick([ // Authentication Handler. //{{{
+                [spc.authHandler, "all"],
+                [spc.authHandler],
+                [Prefs.defaults, "authHandler.all"],
+                [Prefs.defaults, "authHandler"],
+                [Auth.defaultHandler] // Default.
+            ], functionDuck)//}}}
+            , Util.pick([ // Access Control properties. //{{{
+                [Prefs.ac],
+                {}
+            ], functionDuck)//}}}
+        );
+    };//}}}
 
     // Shorthand for single-method functions://{{{
     if (! Prefs.noLib) Object.keys(R.fn).filter(function(k){
