@@ -12,6 +12,7 @@
 var Path = require("path");
 var Express = require("express");
 var Util = require("./lib/util.js");
+var Helpers = require("./lib/helpers.js");
 var Cfg = require("./cfg.js");
 
 var Tpl = {
@@ -29,7 +30,7 @@ function functionDuck(duck) {
     return typeof duck == "function";
 };
 
-module.exports = function APIloader(api, Options) { //{{{
+module.exports = function PASAR(api, Options) { //{{{
 
     // Create new router:
     var R = Express.Router();
@@ -219,8 +220,12 @@ module.exports = function APIloader(api, Options) { //{{{
                 };
             }
             , function(input , outputFilter , res , next) {
-                res.header("Content-Type", "text/html");
-                res.send(outputFilter(input));
+                input.then(function(data){
+                    res.header("Content-Type", "text/html");
+                    res.send(outputFilter(data));
+                }).catch(function(err){
+                    Helpers.sendStatusMessage("error", err);
+                });
             }
             , Util.pick([ // Authentication Handler. //{{{
                 [spc.authHandler, "all"],
