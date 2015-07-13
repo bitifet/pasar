@@ -3,10 +3,118 @@ PASAR
 
 Promise Aware Smart API Rest builder.
 
-Let's to easily build Express routers with an Smart API REST capabilities.
+PASAR is a tool to easyly build Express routers with an Smart API REST
+capabilities.
 
-<a name="features"></a>Features:
---------------------------------
+
+
+<a name="index"></a>Índex
+-------------------------
+
+  * [Abstract](#abstract")
+      - [Definitions](#definitions")
+      - [Notes](#abstractNotes")
+  * [Features](#features")
+      - [Basic](#featBasic")
+      - [Advanced](#featAdvanced")
+      - [More...](#featMore")
+  * [Documentation](#documentation)
+  * [Examples](#examples)
+  * [TO-DO list](#TODO)
+  * [Contributing](#contributing)
+
+
+<a name="abstract"></a>Abstract
+-------------------------------
+
+PASAR main goal is to asist you in building consistent and full-featured
+promise-based APIs focusing in your business logic and not bothering about
+plumbing details.
+
+To achieve it, PASAR proposes a clear and consistent routing schema with a few
+conventions to achieve orthogonal feature access. 
+
+That is: To build a full featured API REST, you only need to provide one or two things:
+
+  * A list of (route-) named API function specifications (which, to avoid confusion, we will call it "services" or "service definitions" from now on).
+  * An optional Options object to fine-tune PASAR behaviour.
+
+Example:
+
+    var Pasar = require("pasar");
+
+    var Options = {
+        // ...
+    };
+
+    var myApi = {
+        myFunctionName: {
+            // Service definition.
+        },
+        // ...
+    };
+
+    module.exports = Pasar(myApi, Options);
+
+
+Service definitions consists in an object with one or more attributes. Simples't service definition looks like:
+
+    myFunctionName: {
+        _all: function myFunction(input, ac) { // Use _get, _post, etc.. to attach your handler to specific http method.
+            // input: Your input data. No matter if send by get, post, put, etc...
+            //     ...but you can fine-tune this by overridding default request mapper.
+            // auth: FIXME: Document it!!.
+
+            return new Pasar.Promise(function(resolve, reject) {
+                // Do some (async) logic...
+
+                // ...and finally:
+                resolve(someData);
+                // ...or:
+                reject(reason);
+            });
+        },
+    },
+
+
+(See more complete [examples]() later...)
+
+
+###<a name="definitions"></a>Definitions
+
+Service
+: With "Service" we mean any functionality attached to unique url of our API no matter which methods (get, post...) attends or not.
+
+Service Definition
+: Javascript object providing all functions needed to implement all available methods of service and some other optional properties which lets us to change service behaviour in any manner.
+
+Actions
+: Actions (or Action Handlers) are functions attached to ``_get``, ``_post``, ``_put``, ``_delete`` or ``_all`` properties of a Service Definition. They are expected to return a promise of the result data. But, if don't, it's actual result will be automatically promisified.
+
+Request Mapper
+: A Request Mapper is a function responsible to receive the request object and a second parameter with the actual method name and return propper input for the Action Handler. This pattern let's us to access exactly same functionality implementations thouth http as a REST API, or locally as library functions.
+
+Response Mapper
+: Response Mappers are the counterpart of Request Mappers. They receives the promise returned by Actions and perform proper http response (We probably should never override default one).
+
+Facility
+: Facilities are fully automated extra functionalities over all Services (accessed thought *serviceUrl*/*facilityName*) and/or over the whole API (accessed thought /*facilityName*/. The only currently implemented facility is /help.
+
+Export Filters
+: Export Filters (or Export Formatters) let all our services output to be exported to distinct output formats, such as csv, html, etc... SIMPLY adding corresponding extension (.csv, .html...) to the original service url.
+
+
+###<a name="abstractNotes"></a>Notes
+
+  * We can attach same function to any of the ``_get``, ``_post``, ``_put`` and/or ``_delete`` or simply to ``_all`` (which attaches it to all methods except explicitly specified thought ``_get``, ``_post``, etc...). But actins never knows about actual requested method. So, if we want different behaviour, for example, in GET requests than in POST ones, we should specify our own Request Mapper to provide propper Action input depending on the actual request method.
+
+
+
+<a name="features"></a>Features
+-------------------------------
+
+
+###<a name="featBasic"></a>Basic Features
 
   * Easy method (GET, POST, etc...) attachment handling.
 
@@ -23,41 +131,38 @@ Let's to easily build Express routers with an Smart API REST capabilities.
     - Fully automated help index (on root's /help) even for undocumented functions.
 
   * Consistent routing schema:
-    - /myRoute -> Default output (JSON) of your function handler.
+    - /myRoute -> Default output (JSON) of your service.
     - /myRoute.ext -> Export to "ext" format thought provided output format filters.
+    - /myRoute/someId, /myRoute/someId.ext -> Same passing some id...
     - /myRoute/facilityName -> Access to specified facility (/help, /form /test...)
     - /facilityName -> Access to specified facility index (if applies). For example:
         - /help: Help index.
         - /test: Run all tests (not yet implemented).
 
-  * Internally reusable: API function implementation can easily make use of other functions.
+  * Internally reusable: Services implementation can easily make use of other functions.
     - Method handlers receive JSON object with request parameters NOT request, nor response or next express objects.
     - Also, they are expected to return promises, not actual data or, even less, to deal with http handshaking.
 
-  * Externally reusable: All API functions are externally exposed thought 'fn' property of the resulting router.
+  * Externally reusable: All service actions are externally exposed thought 'fn' property of the resulting router.
     - I.E.: myRouter.fn.someFunction.get({...}); // will call that method handler directly.
     - If it has only one available method definition (even if it is 'all'), simply: myRouter.fn.someFunction({...});
     - Also, you can use all available output filters. Example: myRouter.fn["someFunction.html"].get({...});
 
-  * Externally reusable SYNCHRONOUSLY: Just like 'fn', router is provided with 'syncFn' vector providing sync versions of your API functions.
+  * Externally reusable SYNCHRONOUSLY: Just like 'fn', router is provided with 'syncFn' vector providing sync versions of your service actions (Available **only for Node version v0.11.0 or hihger**).
     - This enables you to reuse simple functionalities as sync functions.
     - But be carefull, that THOSE ARE BLOCKING FUNCTIONS. So use at your own risk.
-    - Available only for Node version v0.11.0 or hihger.
-
-  * Global access control policies, including restriction to some functionalities like /help, etc...
-
-  * More comming... (see [TODO](#TODO) )
-
-  * For latest changes see: [CHANGELOG](CHANGELOG.txt)
 
 
-<a name="advFeatures"></a>Advanced Features:
---------------------------------------------
+###<a name="featAdvanced"></a>Advanced Features
 
-  * Advanced access control handling:
+  * Advanced access control policies:
+    - Including restriction to some functionalities like /help, etc...
     - NOT authentication itself.
-    - .... FIXME
-
+        · You can use your own user authentication method like passport
+            (https://www.npmjs.com/package/passport) or your own implementation.
+        · Then, use that and other information to implement your own access control policies.
+        · See "Default Authentication Handler implementation" in
+            [auth.js](lib/auth.js) library for more detailed explanation.
 
 
   * Custom request mapping:
@@ -83,10 +188,17 @@ Let's to easily build Express routers with an Smart API REST capabilities.
 ...for more details about how to implement your own response mapper, see [default Response Mapper implementation](lib/defaultResponseMapper.js).
 
 
+###<a name="featMore"></a>More...
+
+  * More comming... (see [TODO](#TODO) )
+
+  * For latest changes see: [CHANGELOG](CHANGELOG.txt)
 
 
-<a name="documentation"></a>Documentation:
-------------------------------------------
+
+
+<a name="documentation"></a>Documentation
+-----------------------------------------
 
 Currently the only existing documentation consist in below [examples](#examples) and an uncomplete [Usage Manual](doc/Manual.md).
 
@@ -94,8 +206,8 @@ Maybe you would like to help in building better one... (see [Contributing](#cont
 
 
 
-<a name="examples"></a>Examples:
---------------------------------
+<a name="examples"></a>Examples
+-------------------------------
 
 All API definitions should look's like follows:
 
@@ -109,7 +221,12 @@ All API definitions should look's like follows:
         // noHelp: true,    // ...to disable /help facilities.
         // noFilters: true, // ...to disable optional formatting filters.
         // "defaults.help.examples.get": [{}], // ...to automatically provide all your functions help with simple example.
+        // "defaults.authHanlder": myAuthHandler, // ...to sepcify your own authentication handler.
+        // "defaults.requestMapper": myRequestMapper, // ...to sepcify your own request mapper.
+        // "defaults.responseMapper": myResponseMapper, // ...to sepcify your own response mapper.
         // promiseEngine: myPromiseEngine, // ...to provide your own promise engine.
+        // "client.jQuery": "url_to_jQuery" // ...to override jQuery path in facility views.
+        // ... (See documentation for more details on available options).
     };
 
     var myApi = {
@@ -209,7 +326,7 @@ Then, to mount your API REST to your Express router simply:
     // To mount your api at your router root:
     Router.use(someOtherAPI);
 
-    // To access API functions as library:
+    // To access Services as library:
     someApi.fn.someFunction.get({foo: "bar"})
         .then(function(data){console.log(data);})
         .catch(throw)
@@ -219,7 +336,7 @@ Then, to mount your API REST to your Express router simply:
     var resultPromise = somApi.fn["someFunction.html"]({foo: "bar"}); // Promise. Use .then(), .catch()...
         // ".get", ".post", etc... can be ommited when only one method is implemented.
 
-    // To access API functions as sync library:
+    // To access Services as sync library:
     var result = someApi.syncFn.someFunction({foo: "bar"});
         // WARNING:
         //      * Sync functions are blocking. Use at your own risk!!
@@ -236,8 +353,8 @@ Then, to mount your API REST to your Express router simply:
 
 
 
-<a name="TODO"></a> TODO:
--------------------------
+<a name="TODO"></a> TODO
+------------------------
 
   * Easy querying while developing with automated (but customizable) '/form' facilities.
 

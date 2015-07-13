@@ -1,20 +1,57 @@
-PASAR
-=====
+PASAR Reference Manual
+======================
 
-Promise Aware Smart API Rest builder usage manual.
+Promise Aware Smart API Rest builder Reference Manual.
 
-PASAR is a tool that let you to easily build Express routers with an Smart API REST capabilities.
+PASAR is a tool that let you to easily build Express routers with an Smart API
+REST capabilities.
+
+-----------------------------
+
+This is the PASAR (Promise Aware Smart API Rest) builder reference manual.
+
+This document is intended to be a detailed PASAR Reference Manual.  If you
+don't know about PASAR, please, read it's [README](../README.md) file which is
+a better introduction document. Specially, its *definitions* section since
+those concepts are also used here.
+
+-----------------------------
+
+<a name="index"></a>Índex
+-------------------------
+
+  * [Installation](#installation)
+  * [Usage](#usage)
+  * [Mounting API](#mounting)
+  * [Extra properties](#properties)
+  * [Api Specification](#apiSpec)
+    - [[\_get, \_post, \_put, \_delete, \_all] method implementations](#spcMethods)
+    - [help](#spcHelp)
+    - [authHandler](#spcAuthHandler)
+    - [ac](#spcAc)
+    - [requestMapper](#spcRequestMapper)
+    - [responseMapper](#spcResponseMapper)
+  * [Api Options](#apiOptions)
+    - [Feature-disabling Options](#optDisabling)
+    - ["defaults" option](#optDefaults)
+    - ["client" Option](#optClient)
+    - [Miscellaneous Options](#optMisc)
+  * [Advanced Features](#advFeatures)
+    - [Authentication handling](#advAuthHandling)
+    - [Local Library function access (Promises): fn](#advFn)
+    - [Synchronous local library function access: syncFn](#advSyncFn)
 
 
-Installation
-------------
+
+<a name="installation"></a>Installation
+---------------------------------------
 
 To install pasar in your project you just need to type:
 
     npm install --save pasar
 
-Usage
------
+<a name="usage"></a>Usage
+-------------------------
 
 To build your own API REST with PASAR, you just need to do:
 
@@ -30,8 +67,8 @@ Options
 : (Optional) Object with some options which lets you to fine-tune your desired API capabilities. See [Api Options](#apiOptions).
 
 
-Mounting API:
--------------
+<a name="mounting"></a>Mounting API:
+------------------------------------
 
     // Supposing myApp is your Express application:
     myApp.use('/api', myApi); // To mount your api at /api
@@ -44,8 +81,8 @@ Mounting it on another express router is just the same specifying your router in
 Thouth you got a Express router in *myRouter*, to mount it in your Express application or router is as simple as:
 
 
-Extra properties
-----------------
+<a name="properties"></a>Extra properties
+-----------------------------------------
 
 Even being valid Express router, PASAR-generated APIs, are provided with some other useful properties:
 
@@ -53,10 +90,10 @@ Promise
 : Provide access to it's internal Promise engine. This let's you to avoid requiring it every time.
 
 fn
-: Provide access to your api functions as library functions (returning promises). See [Library acces](#fn).
+: Provide access to your api functions as library functions (returning promises). See [Library acces](#advFn).
 
 syncFn
-: Same as fn, but provide synchronous implementations. See [Synchronousr library access](#syncFn).
+: Same as fn, but provide synchronous implementations. See [Synchronousr library access](#advSyncFn).
 
 
 
@@ -76,14 +113,40 @@ Api specification consists in an object in the form:
 
 Each function specification consists of one or more of the below properties:
 
-###[_get, _post, _put, _delete, _all] method implementations.
+###<a name="spcMethods"></a>[\_get, \_post, \_put, \_delete, \_all] method implementations.
 
 FIXME
 
 
-###help:
+###<a name="spcHelp"></a>help
 
 FIXME
+
+
+###<a name="spcAuthHandler"></a>authHandler
+
+Let to override default Authentication Handler.
+
+See "Default Authentication Handler implementation" in [auth.js](../lib/auth.js) library for more detailed explanation.
+
+FIXME: Make a more detailed documentation.
+
+
+###<a name="spcAc"></a>ac
+
+FIXME
+
+
+###<a name="spcRequestMapper"></a>requestMapper
+
+FIXME
+
+
+###<a name="spcResponseMapper"></a>responseMapper
+
+FIXME
+
+
 
 <a name="apiOptions"></a>Api Options
 ------------------------------------
@@ -125,7 +188,7 @@ noFilters (boolean, default = false)
 
 ###<a name="optDefaults"></a>"defaults" Option:
 
-"defaults" Option let's define default values to be merged with all API function definiton.
+"defaults" Option let's define default values to be merged with all Service definitons.
 
 Not fully functional yet. But let's define defaults.help.examples.get as ``[{}]``.
 
@@ -152,17 +215,17 @@ promiseEngine
 FIXME
 
 
-###<a name="auth"></a>Authentication handling
+###<a name="advAuthHandling"></a>Authentication handling
 
 FIXME
 
 
-###<a name="fn"></a>Local library function access (Promises): fn
+###<a name="advFn"></a>Local library function access (Promises): fn
 
 FIXME
 
 
-###<a name="syncFn"></a>Synchronous local library function access: syncFn
+###<a name="advSyncFn"></a>Synchronous local library function access: syncFn
 
 FIXME
 

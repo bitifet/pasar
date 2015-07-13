@@ -3,6 +3,7 @@ CHANGELOG.txt
 
 
     Wrapped controller execution thought Promise.resolve() to ensure valid promise input.
+    Updated README.md and doc/Manual.md.
 
 "version": "0.0.8",
     Clearer namming for request, response mappers and output formatter.
