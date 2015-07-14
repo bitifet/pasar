@@ -4,6 +4,7 @@ CHANGELOG.txt
 
     Wrapped controller execution thought Promise.resolve() to ensure valid promise input.
     Updated README.md and doc/Manual.md.
+    Small project reorganization.
 
 "version": "0.0.8",
     Clearer namming for request, response mappers and output formatter.
@@ -15,7 +16,7 @@ CHANGELOG.txt
 
 "version": "0.0.7",
     Overridable default preferences (thought Options object).
-    Client-side preferences like jQuery path to be used in help and form views.
+    Client-side preferences like jQuery path to be used in facility views.
     Shorthand for partial multidimensional Options. I.e: «"foo.bar.baz": "value"» standing for «foo:{bar:{baz:"value"}}»
     Updated doc/Manual.md
 
