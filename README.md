@@ -1,11 +1,7 @@
 PASAR
 =====
 
-Promise Aware Smart API Rest builder.
-
-PASAR is a tool to easyly build Express routers with an Smart API REST
-capabilities.
-
+> Promise Aware Smart API REST builder to easily implement Express routers with advanced capabilities.
 
 
 <a name="index"></a>Índex
@@ -83,25 +79,25 @@ Service definitions consists in an object with one or more attributes. Simples't
 ###<a name="definitions"></a>Definitions
 
 Service
-: With "Service" we mean any functionality attached to unique url of our API no matter which methods (get, post...) attends or not.
+:   With "Service" we mean any functionality attached to unique url of our API no matter which methods (get, post...) attends or not.
 
 Service Definition
-: Javascript object providing all functions needed to implement all available methods of service and some other optional properties which lets us to change service behaviour in any manner.
+:   Javascript object providing all functions needed to implement all available methods of service and some other optional properties which lets us to change service behaviour in any manner.
 
 Actions
-: Actions (or Action Handlers) are functions attached to ``_get``, ``_post``, ``_put``, ``_delete`` or ``_all`` properties of a Service Definition. They are expected to return a promise of the result data. But, if don't, it's actual result will be automatically promisified.
+:   Actions (or Action Handlers) are functions attached to ``_get``, ``_post``, ``_put``, ``_delete`` or ``_all`` properties of a Service Definition. They are expected to return a promise of the result data. But, if don't, it's actual result will be automatically promisified.
 
 Request Mapper
-: A Request Mapper is a function responsible to receive the request object and a second parameter with the actual method name and return propper input for the Action Handler. This pattern let's us to access exactly same functionality implementations thouth http as a REST API, or locally as library functions.
+:   A Request Mapper is a function responsible to receive the request object and a second parameter with the actual method name and return propper input for the Action Handler. This pattern let's us to access exactly same functionality implementations thouth http as a REST API, or locally as library functions.
 
 Response Mapper
-: Response Mappers are the counterpart of Request Mappers. They receives the promise returned by Actions and perform proper http response (We probably should never override default one).
+:   Response Mappers are the counterpart of Request Mappers. They receives the promise returned by Actions and perform proper http response (We probably should never override default one).
 
 Facility
-: Facilities are fully automated extra functionalities over all Services (accessed thought *serviceUrl*/*facilityName*) and/or over the whole API (accessed thought /*facilityName*/. The only currently implemented facility is /help.
+:   Facilities are fully automated extra functionalities over all Services (accessed thought *serviceUrl*/*facilityName*) and/or over the whole API (accessed thought /*facilityName*/. The only currently implemented facility is /help.
 
 Export Filters
-: Export Filters (or Export Formatters) let all our services output to be exported to distinct output formats, such as csv, html, etc... SIMPLY adding corresponding extension (.csv, .html...) to the original service url.
+:   Export Filters (or Export Formatters) let all our services output to be exported to distinct output formats, such as csv, html, etc... SIMPLY adding corresponding extension (.csv, .html...) to the original service url.
 
 
 ###<a name="abstractNotes"></a>Notes

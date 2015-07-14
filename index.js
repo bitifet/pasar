@@ -93,11 +93,17 @@ function PASAR(api, Options) { //{{{
     };
 
 
-    // Populate all specified routes:
-    for (var rtPath in api) {
-        var fName = rtPath.replace("/", "_"); // Exposed function name.
-        var spc = api[rtPath];               // Function full specification.
-        rtPath = "/" + rtPath;               // Route base path.
+    // Populate all specified services:
+    for (var srvName in api) {
+        var fName = srvName.replace("/", "_"); // Exposed function name.
+        var spc = api[srvName];               // Function full specification.
+
+        var rtPath = (function guessRoutePath(srvName, spc) {
+            var rtPath = spc.path; // Let to specify complet route Path without messing service name.
+            if (rtPath === undefined) rtPath = srvName; // Default to service name if not provided.
+            if (rtPath[0] !== "/") rtPath = "/" + rtPath; // Fix starting slash when missing.
+            return rtPath;
+        })(srvName, spc);
 
         // Build help item route://{{{
         if (! me.Prefs.noHelp) {

@@ -1,12 +1,10 @@
 PASAR Reference Manual
 ======================
 
-Promise Aware Smart API Rest builder Reference Manual.
-
-PASAR is a tool that let you to easily build Express routers with an Smart API
-REST capabilities.
-
------------------------------
+> Promise Aware Smart API Rest builder Reference Manual.
+> 
+> PASAR is a tool that let you to easily build Express routers with an Smart
+> API REST capabilities.
 
 This is the PASAR (Promise Aware Smart API Rest) builder reference manual.
 
@@ -15,7 +13,6 @@ don't know about PASAR, please, read it's [README](../README.md) file which is
 a better introduction document. Specially, its *definitions* section since
 those concepts are also used here.
 
------------------------------
 
 <a name="index"></a>Índex
 -------------------------
@@ -26,7 +23,9 @@ those concepts are also used here.
   * [Extra properties](#properties)
   * [Api Specification](#apiSpec)
     - [[\_get, \_post, \_put, \_delete, \_all] method implementations](#spcMethods)
+    - [path](#spcPath)
     - [help](#spcHelp)
+    - [meta](#spcMeta)
     - [authHandler](#spcAuthHandler)
     - [ac](#spcAc)
     - [requestMapper](#spcRequestMapper)
@@ -104,23 +103,34 @@ syncFn
 Api specification consists in an object in the form:
 
     var apiSpec = {
-        someFunction: { // Function name (relative route path).
-            // (Function specification)
+        serviceName: { // Service name (and default relative route path).
+            // (Service specification)
         },
         // ...
     };
 
 
-Each function specification consists of one or more of the below properties:
+Each service specification consists of one or more of the below properties:
 
 ###<a name="spcMethods"></a>[\_get, \_post, \_put, \_delete, \_all] method implementations.
 
 FIXME
 
 
+###<a name="spcPath"></a>path
+
+Route path specification (defaults to /serviceName if not specified). Inital slash is automatically prepended if missing.
+
+
 ###<a name="spcHelp"></a>help
 
 FIXME
+
+
+###<a name="spcMeta"></a>meta
+
+FIXME
+
 
 
 ###<a name="spcAuthHandler"></a>authHandler
@@ -153,7 +163,12 @@ FIXME
 
 Options object serves to modify PASAR default's behaviour in multiple manner.
 
-NOTE: It is a multidimensional object. But sometimes you could only need to set one specific inner value in a more complex structure. To achieve this, you could use abbreviated "dotted" syntax for Options object keys. For example:
+> NOTE: It is a multidimensional object. But sometimes you could only need to set
+> one specific inner value in a more complex structure. To achieve this, you
+> could use abbreviated "dotted" syntax for Options object keys.
+
+
+For example:
 
     var Options = {
         "defaults.help.examples.get": [{}],
