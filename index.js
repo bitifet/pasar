@@ -26,10 +26,6 @@ var Auth = require("./lib/auth.js");
 
 var exportFilters = require("./lib/formatters.js");
 
-function functionDuck(duck) {
-    return typeof duck == "function";
-};
-
 function PASAR(api, Options) { //{{{
 
     var me = this;
@@ -126,12 +122,12 @@ function PASAR(api, Options) { //{{{
                     [me.Prefs.defaults, "authHandler.all"],
                     [me.Prefs.defaults, "authHandler"],
                     [Auth.defaultHandler] // Default.
-                ], functionDuck)//}}}
+                ], Util.duckFn)//}}}
                 , Util.pick([ // Access Control properties. //{{{
                     [spc.ac],
                     [me.Prefs.ac],
                     {}
-                ], functionDuck)//}}}
+                ], Util.duckFn)//}}}
                 , spc.ac                // Access Control data (from specification).
             );
 
@@ -154,7 +150,7 @@ function PASAR(api, Options) { //{{{
                 [me.Prefs.defaults, "requestMapper.all"],
                 [me.Prefs.defaults, "requestMapper"],
                 [defaultRequestMapper] // Default.
-            ], functionDuck);//}}}
+            ], Util.duckFn);//}}}
 
             var responseMapper = Util.pick([//{{{
                 [spc.responseMapper, method],
@@ -164,7 +160,7 @@ function PASAR(api, Options) { //{{{
                 [me.Prefs.defaults, "responseMapper.all"],
                 [me.Prefs.defaults, "responseMapper"],
                 [defaultResponseMapper] // Default.
-            ], functionDuck);//}}}
+            ], Util.duckFn);//}}}
             
             var authHandler = Util.pick([//{{{
                 [spc.authHandler, method],
@@ -174,7 +170,7 @@ function PASAR(api, Options) { //{{{
                 [me.Prefs.defaults, "authHandler.all"],
                 [me.Prefs.defaults, "authHandler"],
                 [Auth.defaultHandler] // Default.
-            ], functionDuck);//}}}
+            ], Util.duckFn);//}}}
 
 
             // Append main route://{{{
@@ -215,7 +211,7 @@ function PASAR(api, Options) { //{{{
             "/help"
             , Tpl.helpIndex     // Directly injected Output formatter.
             , '/help'           // Facility name.
-            , function (input) {return input;}
+            , Util.dumbFn
             , function(req, method) {
                 return {
                     path: Path.dirname(req.uri.pathname),
@@ -237,11 +233,11 @@ function PASAR(api, Options) { //{{{
                 [me.Prefs.defaults, "authHandler.all"],
                 [me.Prefs.defaults, "authHandler"],
                 [Auth.defaultHandler] // Default.
-            ], functionDuck)//}}}
+            ], Util.duckFn)//}}}
             , Util.pick([ // Access Control properties. //{{{
                 [me.Prefs.ac],
                 {}
-            ], functionDuck)//}}}
+            ], Util.duckFn)//}}}
         );
     };//}}}
 
@@ -297,9 +293,19 @@ PASAR.prototype.buildHandler = function buildHandler(//{{{
         var outputFilter = exportFilters[ext];
     };
 
-    if (! outputFilter) outputFilter = function(input){return input;};
     if (! ac) ac = {};
 
+    // Output Filter and Output Filter runtime options://{{{
+    if (! outputFilter) outputFilter = Util.dumbFn; // Default Output Filter.
+
+    // Request handler to retrive runtime options for output filter.
+    var ofReqHandler = (typeof outputFilter.requestHandler == "function")
+        ? outputFilter.requestHandler
+        : function (req) {return {};} // (Default)
+    ;
+    // NOTE: Output filters are usually expected to NOT depend on request input.
+    //  ...but, defining a requestHandler property over them, you could easily change that.
+    //}}}
 
     me.R[method](routePath, function (req,res,next) {
 
@@ -316,7 +322,6 @@ PASAR.prototype.buildHandler = function buildHandler(//{{{
 
         if (! auth) return;
 
-
         var input = (typeof ctrl == "function")
             ? me.R.Promise.resolve(ctrl(
                 requestMapper(req, method) // Our function input data.
@@ -328,8 +333,9 @@ PASAR.prototype.buildHandler = function buildHandler(//{{{
         responseMapper(
             input 
             , function fullOutputFilter(input) {
-                return outputFilter(   // Formatting filter.
-                    auth.filter(input) // Authentication filter.
+                return outputFilter(     // Formatting filter.
+                    auth.filter(input)   // Authentication filter.
+                    , ofReqHandler(req)  // Runtime output filter options (usually {}).
                 );
             }
             , res
@@ -428,16 +434,12 @@ PASAR.prototype.hlpAutocomplete = function hlpAutocompleter(src, fnPath) {//{{{
     
 PASAR.prototype.buildPrefs = function applyDefaultPreferences(Options) {//{{{
 
-    var prefs = {};
-    Util.propExpand(Options);
-
     // Sanityze options:
     if (Options === undefined) Options = {};
+    Util.propExpand(Options);
 
     // Accept all options as preferences:
-    Object.keys(Options).filter(function(k){
-        prefs[k] = Options[k];
-    });
+    var prefs = Util.oMap(Options, Util.dumbFn);
 
     // Define some extra default values:
     Util.propSet(prefs, "client.jQuery", Cfg.paths.jQuery);
