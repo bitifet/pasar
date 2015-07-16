@@ -42,53 +42,6 @@ function PASAR(api, Options) { //{{{
         me.R.Promise = require('promise');
     };
     
-    var Tools = {
-        exposeCallable: (function(){//{{{
-
-            function buildFunction (handler, filter) {//{{{
-                return function (input) {
-                    return new me.R.Promise(function(resolve, reject){
-                        handler.call(this, input)
-                            .then(function(result){
-                                resolve(filter(result));
-                            })
-                            .catch(reject)
-                        ;
-                    });
-                };
-            };//}}}
-
-            return function buildCallable(fName, handler, method){ // Expose handler as callable function://{{{
-
-                if (me.R.fn === undefined) {
-                    me.R.fn = {};
-                    me.R.syncFn = {};
-                };
-
-                // With default output filter:
-                if (me.R.fn[fName] === undefined) {
-                    me.R.fn[fName] = {};
-                    me.R.syncFn[fName] = {};
-                };
-                me.R.fn[fName][method] = buildFunction(handler, exportFilters[Cfg.defaultOutputFilter]);
-                me.R.syncFn[fName][method] = Util.depromise(me.R.fn[fName][method]);
-
-                // For all available filters:
-                if (! me.Prefs.noFilters) for (var ext in exportFilters) {
-                    if (me.R.fn[fName+"."+ext] === undefined) {
-                        me.R.fn[fName+"."+ext] = {};
-                        me.R.syncFn[fName+"."+ext] = {};
-                    };
-                    me.R.fn[fName+"."+ext][method] = buildFunction(handler, exportFilters[ext]);
-                    me.R.syncFn[fName+"."+ext][method] = Util.depromise(me.R.fn[fName+"."+ext][method]);
-                };
-
-            }; //}}}
-
-        })(),//}}}
-    };
-
-
     // Populate all specified services:
     for (var srvName in api) {
         var fName = srvName.replace("/", "_"); // Exposed function name.
@@ -108,8 +61,8 @@ function PASAR(api, Options) { //{{{
             me.buildHandler(
                 // Using buildHandler ensures consistent behaviour.
                 rtPath + "/help"
-                , Tpl.helpItem      // Directly injected Output formatter.
                 , '/help'           // Facility name.
+                , Tpl.helpItem      // Directly injected Output formatter.
                 , spc.help          // Actual input.
                 , null              // No request handler.
                 , function(input , outputFilter , res , next) {
@@ -140,7 +93,7 @@ function PASAR(api, Options) { //{{{
             if (rtHandler === undefined) return; // Avoid trying to map unspecified method handlers.
             //}}}
 
-            if (! me.Prefs.noLib) Tools.exposeCallable (fName, rtHandler, method);
+            if (! me.Prefs.noLib) me.exposeCallable (fName, rtHandler, method);
 
             var requestMapper = Util.pick([//{{{
                 [spc.requestMapper, method],
@@ -176,8 +129,8 @@ function PASAR(api, Options) { //{{{
             // Append main route://{{{
             me.buildHandler(
                 rtPath
-                , null
                 , method
+                , exportFilters[Cfg.defaultOutputFilter]
                 , rtHandler
                 , requestMapper
                 , responseMapper
@@ -190,8 +143,8 @@ function PASAR(api, Options) { //{{{
             if (! me.Prefs.noFilters) for (var ext in exportFilters) {
                 me.buildHandler(
                     rtPath
-                    , ext
                     , method
+                    , [exportFilters[ext], ext]
                     , rtHandler
                     , requestMapper
                     , responseMapper
@@ -209,8 +162,8 @@ function PASAR(api, Options) { //{{{
         me.buildHandler(
             // Using buildHandler ensures consistent behaviour.
             "/help"
-            , Tpl.helpIndex     // Directly injected Output formatter.
             , '/help'           // Facility name.
+            , Tpl.helpIndex     // Directly injected Output formatter.
             , Util.dumbFn
             , function(req, method) {
                 return {
@@ -257,17 +210,13 @@ function PASAR(api, Options) { //{{{
         };
     });//}}}
 
-
-    // Do some cleanup:
-    for (var i in Tools) delete Tools[i];
-
     return me.R;
 };//}}}
 
 PASAR.prototype.buildHandler = function buildHandler(//{{{
         pathSpec       // Base route path.
-        , ext            // Extension (Output formatter). Ex.: "html"
         , service        // Method name (or "all") or facility name (Ex.: "/help");
+        , flt            // [outputFilter, fileExtension]
         , ctrl           // Our actual functionality implementation returning promise.
         , requestMapper  // Request handler to obtain input object.
         , responseMapper // Response handler to serve returning data.
@@ -276,22 +225,19 @@ PASAR.prototype.buildHandler = function buildHandler(//{{{
 ) {
     var me = this;
 
-    // Facilities:
-    if (service[0] == "/") { // This is a facility handler.
-        var method = "get"; // Facilities are always thought GET.
-        var routePath = pathSpec;
-        var outputFilter = ext; // Filter is directly injected.
-    }
-    // API function handlers:
-    else if (! ext) { // Default route => Default output formatter.
-        var method = service;
-        var routePath = pathSpec;
-        var outputFilter =  exportFilters[Cfg.defaultOutputFilter];
-    } else { // Route with extension => Custom output formatter.
-        var method = service;
-        var routePath = pathSpec + "." + ext;
-        var outputFilter = exportFilters[ext];
-    };
+    if (! (flt instanceof Array)) flt = [flt];
+    var ext = flt[1];
+    var outputFilter = flt[0];
+
+    var method = (service[0] == "/")
+        ? "get"     // Facilitiy. Always called thought GET method.
+        : service   // Actual service method handler.
+    ;
+
+    var routePath = ext
+        ? pathSpec + "." + ext
+        : pathSpec
+    ;
 
     if (! ac) ac = {};
 
@@ -448,6 +394,51 @@ PASAR.prototype.buildPrefs = function applyDefaultPreferences(Options) {//{{{
 
 };//}}}
 
+PASAR.prototype.exposeCallable = (function(){//{{{
+
+    function buildFunction (router, handler, filter) {//{{{
+        return function (input) {
+            return new router.Promise(function(resolve, reject){
+                handler.call(this, input)
+                    .then(function(result){
+                        resolve(filter(result));
+                    })
+                    .catch(reject)
+                ;
+            });
+        };
+    };//}}}
+
+    return function buildCallable(fName, handler, method){ // Expose handler as callable function://{{{
+
+        var me = this;
+
+        if (me.R.fn === undefined) {
+            me.R.fn = {};
+            me.R.syncFn = {};
+        };
+
+        // With default output filter:
+        if (me.R.fn[fName] === undefined) {
+            me.R.fn[fName] = {};
+            me.R.syncFn[fName] = {};
+        };
+        me.R.fn[fName][method] = buildFunction(me.R, handler, exportFilters[Cfg.defaultOutputFilter]);
+        me.R.syncFn[fName][method] = Util.depromise(me.R.fn[fName][method]);
+
+        // For all available filters:
+        if (! me.Prefs.noFilters) for (var ext in exportFilters) {
+            if (me.R.fn[fName+"."+ext] === undefined) {
+                me.R.fn[fName+"."+ext] = {};
+                me.R.syncFn[fName+"."+ext] = {};
+            };
+            me.R.fn[fName+"."+ext][method] = buildFunction(me.R, handler, exportFilters[ext]);
+            me.R.syncFn[fName+"."+ext][method] = Util.depromise(me.R.fn[fName+"."+ext][method]);
+        };
+
+    }; //}}}
+
+})();//}}}
 
 
 

@@ -37,6 +37,7 @@ That is: To build a full featured API REST, you only need to provide one or two 
 
 Example:
 
+```javascript
     var Pasar = require("pasar");
 
     var Options = {
@@ -44,18 +45,20 @@ Example:
     };
 
     var myApi = {
-        myFunctionName: {
+        myServiceName: {
             // Service definition.
         },
         // ...
     };
 
     module.exports = Pasar(myApi, Options);
+```
 
 
 Service definitions consists in an object with one or more attributes. Simples't service definition looks like:
 
-    myFunctionName: {
+```javascript
+    myServiceName: {
         _all: function myFunction(input, ac) { // Use _get, _post, etc.. to attach your handler to specific http method.
             // input: Your input data. No matter if send by get, post, put, etc...
             //     ...but you can fine-tune this by overridding default request mapper.
@@ -71,6 +74,7 @@ Service definitions consists in an object with one or more attributes. Simples't
             });
         },
     },
+```
 
 
 (See more complete [examples]() later...)
@@ -374,6 +378,10 @@ Then, to mount your API REST to your Express router simply:
     - Will provide javascript client library downloadable thought /client.
     - This library will provide a js API to access server's API-REST functionalities.
     - Also, will integrate support for WebSockete update events transparently handling "diff" packed data.
+
+  * Unit testing:
+    - Implement unit tests to ensure new changes doesn't broke anything.
+    - Move to 0.1.x versions and pass those tests before any commit.
 
 
 <a name="contributing"></a>Contributing
