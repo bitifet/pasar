@@ -76,11 +76,11 @@ Service definitions consists in an object with one or more attributes. Simples't
     },
 ```
 
-
 (See more complete [examples]() later...)
 
 
 ###<a name="definitions"></a>Definitions
+
 
 Service
 :   With "Service" we mean any functionality attached to unique url of our API no matter which methods (get, post...) attends or not.
@@ -106,6 +106,7 @@ Export Filters
 
 ###<a name="abstractNotes"></a>Notes
 
+
   * We can attach same function to any of the ``_get``, ``_post``, ``_put`` and/or ``_delete`` or simply to ``_all`` (which attaches it to all methods except explicitly specified thought ``_get``, ``_post``, etc...). But actins never knows about actual requested method. So, if we want different behaviour, for example, in GET requests than in POST ones, we should specify our own Request Mapper to provide propper Action input depending on the actual request method.
 
 
@@ -115,6 +116,7 @@ Export Filters
 
 
 ###<a name="featBasic"></a>Basic Features
+
 
   * Easy method (GET, POST, etc...) attachment handling.
 
@@ -155,6 +157,7 @@ Export Filters
 
 ###<a name="featAdvanced"></a>Advanced Features
 
+
   * Advanced access control policies:
     - Including restriction to some functionalities like /help, etc...
     - NOT authentication itself.
@@ -189,6 +192,7 @@ Export Filters
 
 
 ###<a name="featMore"></a>More...
+
 
   * More comming... (see [TODO](#TODO) )
 
