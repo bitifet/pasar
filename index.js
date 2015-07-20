@@ -24,23 +24,29 @@ var defaultRequestMapper = require("./lib/defaultRequestMapper.js");
 var defaultResponseMapper = require("./lib/defaultResponseMapper.js");
 var Auth = require("./lib/auth.js");
 
-var exportFilters = require("./lib/formatters.js");
+var Fmt = require("./lib/formatters.js");
 
 function PASAR(api, Options) { //{{{
 
     var me = this;
 
-    // Create new router:
-    me.R = Express.Router();
-    
-    me.Prefs = this.buildPrefs(Options);
+    me.R = Express.Router();                // Create new router.
+    me.Prefs = this.buildPrefs(Options);    // Initialyze preferences.
+    me.R.Promise = me.Prefs.promiseEngine   // Pick for Promise engine.//{{{
+        ? me.Prefs.promiseEngine
+        : require('promise')
+    ;//}}}
+    me.Filters = Fmt.load(                  // Load output filters.//{{{
+        {}
+        , Fmt.filters               // Load all core filters by default.
+        , me.Prefs.outputFilters    // Let to disable, change or reconfigure
+                                    // all of them thought outputFilters Option.
+    );//}}}
+    me.defaultFilter = Fmt.check(           // Set default filter.
+        me.Filters[me.Prefs.defaultFilter],
+        me.Prefs.defaultFilter
+    );
 
-    // Attach Promise Engine:
-    if (me.Prefs.promiseEngine) {
-        me.R.Promise = me.Prefs.promiseEngine;
-    } else if (! me.R.Promise) {
-        me.R.Promise = require('promise');
-    };
     
     // Populate all specified services:
     for (var srvName in api) {
@@ -48,7 +54,7 @@ function PASAR(api, Options) { //{{{
         var spc = api[srvName];               // Function full specification.
 
         var rtPath = (function guessRoutePath(srvName, spc) {
-            var rtPath = spc.path; // Let to specify complet route Path without messing service name.
+            var rtPath = spc.path; // Let to specify complete route Path without messing service name.
             if (rtPath === undefined) rtPath = srvName; // Default to service name if not provided.
             if (rtPath[0] !== "/") rtPath = "/" + rtPath; // Fix starting slash when missing.
             return rtPath;
@@ -93,7 +99,17 @@ function PASAR(api, Options) { //{{{
             if (rtHandler === undefined) return; // Avoid trying to map unspecified method handlers.
             //}}}
 
-            if (! me.Prefs.noLib) me.exposeCallable (fName, rtHandler, method);
+            var outputFilters = Fmt.load(
+                me.Filters
+                , Util.pick([
+                    [spc.outputFilters, method],
+                    [spc.outputFilters, "all"],
+                    [spc.outputFilters],
+                    [{}],
+                ])
+            );
+
+            if (! me.Prefs.noLib) me.exposeCallable (fName, rtHandler, method, outputFilters);
 
             var requestMapper = Util.pick([//{{{
                 [spc.requestMapper, method],
@@ -125,12 +141,11 @@ function PASAR(api, Options) { //{{{
                 [Auth.defaultHandler] // Default.
             ], Util.duckFn);//}}}
 
-
             // Append main route://{{{
             me.buildHandler(
                 rtPath
                 , method
-                , exportFilters[Cfg.defaultOutputFilter]
+                , me.defaultFilter
                 , rtHandler
                 , requestMapper
                 , responseMapper
@@ -140,11 +155,11 @@ function PASAR(api, Options) { //{{{
             //}}}
 
             // Append routes for all available output filters://{{{
-            if (! me.Prefs.noFilters) for (var ext in exportFilters) {
+            if (! me.Prefs.noFilters) for (var ext in outputFilters) {
                 me.buildHandler(
                     rtPath
                     , method
-                    , [exportFilters[ext], ext]
+                    , [outputFilters[ext], ext]
                     , rtHandler
                     , requestMapper
                     , responseMapper
@@ -387,8 +402,12 @@ PASAR.prototype.buildPrefs = function applyDefaultPreferences(Options) {//{{{
     // Accept all options as preferences:
     var prefs = Util.oMap(Options, Util.dumbFn);
 
+    // Select default output filter:
+    Util.propSet(prefs, "defaultFilter", Cfg.defaultOutputFilter);
+
     // Define some extra default values:
     Util.propSet(prefs, "client.jQuery", Cfg.paths.jQuery);
+
 
     return prefs;
 
@@ -409,7 +428,7 @@ PASAR.prototype.exposeCallable = (function(){//{{{
         };
     };//}}}
 
-    return function buildCallable(fName, handler, method){ // Expose handler as callable function://{{{
+    return function buildCallable(fName, handler, method, Filters){ // Expose handler as callable function://{{{
 
         var me = this;
 
@@ -423,17 +442,18 @@ PASAR.prototype.exposeCallable = (function(){//{{{
             me.R.fn[fName] = {};
             me.R.syncFn[fName] = {};
         };
-        me.R.fn[fName][method] = buildFunction(me.R, handler, exportFilters[Cfg.defaultOutputFilter]);
+        me.R.fn[fName][method] = buildFunction(me.R, handler, me.defaultFilter);
         me.R.syncFn[fName][method] = Util.depromise(me.R.fn[fName][method]);
 
         // For all available filters:
-        if (! me.Prefs.noFilters) for (var ext in exportFilters) {
+        if (! me.Prefs.noFilters) for (var ext in Filters) {
             if (me.R.fn[fName+"."+ext] === undefined) {
                 me.R.fn[fName+"."+ext] = {};
                 me.R.syncFn[fName+"."+ext] = {};
             };
-            me.R.fn[fName+"."+ext][method] = buildFunction(me.R, handler, exportFilters[ext]);
-            me.R.syncFn[fName+"."+ext][method] = Util.depromise(me.R.fn[fName+"."+ext][method]);
+            var f = buildFunction(me.R, handler, Filters[ext]);
+            me.R.fn[fName+"."+ext][method] = f;
+            me.R.syncFn[fName+"."+ext][method] = Util.depromise(f);
         };
 
     }; //}}}
