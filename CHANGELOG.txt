@@ -3,6 +3,7 @@ CHANGELOG.txt
 
 
     Implemented Output Filters extendability.
+    Added automated filters help (thought service /help facility).
 
 "version": "0.0.9",
     Wrapped controller execution thought Promise.resolve() to ensure valid promise input.

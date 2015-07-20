@@ -43,6 +43,20 @@ html
                         if ! m.implemented
                             b.
                                 &nbsp;(UNIMPLEMENTED)
+    if Object.keys(filters).length
+        div
+            h2 Available Filters:
+            ul
+                each fitems, ext in filters
+                    each fdata, k in fitems
+                        li
+                            b.
+                                .#{ext}:&nbsp;
+                            span= fdata.contents
+                            - var m = "["+fdata.methods.join(", ")+"]";
+                            b.
+                                &nbsp;#{m}
+                            
     if Object.keys(examples).length
         div
             h2 Examples:

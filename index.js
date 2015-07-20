@@ -60,37 +60,7 @@ function PASAR(api, Options) { //{{{
             return rtPath;
         })(srvName, spc);
 
-        // Build help item route://{{{
-        if (! me.Prefs.noHelp) {
-            spc.help = me.hlpAutocomplete(spc, rtPath);
-
-            me.buildHandler(
-                // Using buildHandler ensures consistent behaviour.
-                rtPath + "/help"
-                , '/help'           // Facility name.
-                , Tpl.helpItem      // Directly injected Output formatter.
-                , spc.help          // Actual input.
-                , null              // No request handler.
-                , function(input , outputFilter , res , next) {
-                    res.header("Content-Type", "text/html");
-                    res.send(outputFilter(input));
-                }
-                , Util.pick([ // Authentication Handler. //{{{
-                    [spc.authHandler, "all"],
-                    [spc.authHandler],
-                    [me.Prefs.defaults, "authHandler.all"],
-                    [me.Prefs.defaults, "authHandler"],
-                    [Auth.defaultHandler] // Default.
-                ], Util.duckFn)//}}}
-                , Util.pick([ // Access Control properties. //{{{
-                    [spc.ac],
-                    [me.Prefs.ac],
-                    {}
-                ], Util.duckFn)//}}}
-                , spc.ac                // Access Control data (from specification).
-            );
-
-        };//}}}
+        var fltHelp = {};
 
         Cfg.validMethods.map(function(method){
 
@@ -99,7 +69,7 @@ function PASAR(api, Options) { //{{{
             if (rtHandler === undefined) return; // Avoid trying to map unspecified method handlers.
             //}}}
 
-            var outputFilters = Fmt.load(
+            var outputFilters = Fmt.load(//{{{
                 me.Filters
                 , Util.pick([
                     [spc.outputFilters, method],
@@ -108,8 +78,16 @@ function PASAR(api, Options) { //{{{
                     [{}],
                 ])
             );
+            if (! me.Prefs.noHelp) {
+                me.indexFiltersHelp (fltHelp, outputFilters, method);
+            };//}}}
 
-            if (! me.Prefs.noLib) me.exposeCallable (fName, rtHandler, method, outputFilters);
+            if (! me.Prefs.noLib) me.exposeCallable (//{{{
+                fName
+                , rtHandler
+                , method
+                , outputFilters
+            );//}}}
 
             var requestMapper = Util.pick([//{{{
                 [spc.requestMapper, method],
@@ -169,6 +147,39 @@ function PASAR(api, Options) { //{{{
             };//}}}
 
         });
+
+        // Build help item route://{{{
+        if (! me.Prefs.noHelp) {
+            spc.help = me.hlpAutocomplete(spc, rtPath, fltHelp);
+
+            me.buildHandler(
+                // Using buildHandler ensures consistent behaviour.
+                rtPath + "/help"
+                , '/help'           // Facility name.
+                , Tpl.helpItem      // Directly injected Output formatter.
+                , spc.help          // Actual input.
+                , null              // No request handler.
+                , function(input , outputFilter , res , next) {
+                    res.header("Content-Type", "text/html");
+                    res.send(outputFilter(input));
+                }
+                , Util.pick([ // Authentication Handler. //{{{
+                    [spc.authHandler, "all"],
+                    [spc.authHandler],
+                    [me.Prefs.defaults, "authHandler.all"],
+                    [me.Prefs.defaults, "authHandler"],
+                    [Auth.defaultHandler] // Default.
+                ], Util.duckFn)//}}}
+                , Util.pick([ // Access Control properties. //{{{
+                    [spc.ac],
+                    [me.Prefs.ac],
+                    {}
+                ], Util.duckFn)//}}}
+                , spc.ac                // Access Control data (from specification).
+            );
+
+        };//}}}
+
 
     };
 
@@ -307,7 +318,21 @@ PASAR.prototype.buildHandler = function buildHandler(//{{{
 
 };//}}}
 
-PASAR.prototype.hlpAutocomplete = function hlpAutocompleter(src, fnPath) {//{{{
+PASAR.prototype.indexFiltersHelp = function (target, fdata, method) {//{{{
+    for (var ext in fdata) {
+        var contents = fdata[ext].help;
+        if (! contents) contents = ext + " output formatter"; // Description failback.
+        var key = JSON.stringify(contents);
+        if (target[ext] === undefined) target[ext] = {};
+        if (target[ext][key] === undefined) target[ext][key] = {
+            contents: contents,
+            methods: [],
+        };
+        target[ext][key].methods.push(method);
+    };
+};//}}}
+
+PASAR.prototype.hlpAutocomplete = function hlpAutocompleter(src, fnPath, fltHelp) {//{{{
 
     var me = this;
     var hlp = src.help;
@@ -320,6 +345,7 @@ PASAR.prototype.hlpAutocomplete = function hlpAutocompleter(src, fnPath) {//{{{
     hlp.meta = src.meta;
     hlp.path = fnPath;
     hlp.prefs = me.Prefs.client;
+    hlp.filters = fltHelp;
 
     if (! hlp.meta) hlp.meta = {};
     if (! hlp.contents) hlp.contents = "";
@@ -459,7 +485,6 @@ PASAR.prototype.exposeCallable = (function(){//{{{
     }; //}}}
 
 })();//}}}
-
 
 
 function apiBuilder (apiSpec, Options) {//{{{
