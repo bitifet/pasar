@@ -79,7 +79,7 @@ Service definitions consists in an object with one or more attributes. Simples't
 (See more complete [examples]() later...)
 
 
-###<a name="definitions"></a>Definitions
+### <a name="definitions"></a>Definitions
 
 
 Service
@@ -104,7 +104,7 @@ Output Filters
 :   Output Filters (or Output Formatters) let all our services output to be exported to distinct output formats, such as csv, html, etc... SIMPLY adding corresponding extension (.csv, .html...) to the original service url.
 
 
-###<a name="abstractNotes"></a>Notes
+### <a name="abstractNotes"></a>Notes
 
 
   * We can attach same function to any of the ``_get``, ``_post``, ``_put`` and/or ``_delete`` or simply to ``_all`` (which attaches it to all methods except explicitly specified thought ``_get``, ``_post``, etc...). But actins never knows about actual requested method. So, if we want different behaviour, for example, in GET requests than in POST ones, we should specify our own Request Mapper to provide propper Action input depending on the actual request method.
@@ -115,7 +115,7 @@ Output Filters
 -------------------------------
 
 
-###<a name="featBasic"></a>Basic Features
+### <a name="featBasic"></a>Basic Features
 
 
   * Easy method (GET, POST, etc...) attachment handling.
@@ -155,7 +155,7 @@ Output Filters
     - But be carefull, that THOSE ARE BLOCKING FUNCTIONS. So use at your own risk.
 
 
-###<a name="featAdvanced"></a>Advanced Features
+### <a name="featAdvanced"></a>Advanced Features
 
 
   * Advanced access control policies:
@@ -191,7 +191,7 @@ Output Filters
 ...for more details about how to implement your own response mapper, see [default Response Mapper implementation](lib/defaultResponseMapper.js).
 
 
-###<a name="featMore"></a>More...
+### <a name="featMore"></a>More...
 
 
   * More comming... (see [TODO](#TODO) )

@@ -12,24 +12,21 @@
 var Path = require("path");
 var Express = require("express");
 var Url = require("url");
-var Util = require("./lib/util.js");
 var Cfg = require("./cfg.js");
+var Util = require("./lib/util.js");
+var Auth = require("./lib/auth.js");
+var Fmt = require("./lib/formatters.js");
+var defaultRequestMapper = require("./lib/defaultRequestMapper.js");
+var defaultResponseMapper = require("./lib/defaultResponseMapper.js");
 
 var Tpl = {
     helpIndex: Util.tpl("helpIndex.jade"),
     helpItem: Util.tpl("helpItem.jade"),
 };
 
-var defaultRequestMapper = require("./lib/defaultRequestMapper.js");
-var defaultResponseMapper = require("./lib/defaultResponseMapper.js");
-var Auth = require("./lib/auth.js");
-
-var Fmt = require("./lib/formatters.js");
-
 function PASAR(api, Options) { //{{{
 
     var me = this;
-
     me.R = Express.Router();                // Create new router.
     me.Prefs = this.buildPrefs(Options);    // Initialyze preferences.
     me.R.Promise = me.Prefs.promiseEngine   // Pick for Promise engine.//{{{
@@ -42,26 +39,27 @@ function PASAR(api, Options) { //{{{
         , me.Prefs.outputFilters    // Let to disable, change or reconfigure
                                     // all of them thought outputFilters Option.
     );//}}}
-    me.defaultFilter = Fmt.check(           // Set default filter.
+    me.defaultFilter = Fmt.check(           // Set default filter.//{{{
         me.Filters[me.Prefs.defaultFilter],
         me.Prefs.defaultFilter
-    );
-
+    );//}}}
     
-    // Populate all specified services:
+    // Populate all specified services://{{{
+    // ================================
     for (var srvName in api) {
         var fName = srvName.replace("/", "_"); // Exposed function name.
-        var spc = api[srvName];               // Function full specification.
+        var spc = api[srvName];                // Function full specification.
+        var fltIndex = {};
 
-        var rtPath = (function guessRoutePath(srvName, spc) {
+        var rtPath = (function guessRoutePath(srvName, spc) { // Resolve route path.//{{{
             var rtPath = spc.path; // Let to specify complete route Path without messing service name.
             if (rtPath === undefined) rtPath = srvName; // Default to service name if not provided.
             if (rtPath[0] !== "/") rtPath = "/" + rtPath; // Fix starting slash when missing.
             return rtPath;
-        })(srvName, spc);
+        })(srvName, spc);//}}}
 
-        var fltHelp = {};
-
+        // Build all service method routes: //{{{
+        // --------------------------------
         Cfg.validMethods.map(function(method){
 
             // Get route Handler (Controller)://{{{
@@ -79,15 +77,8 @@ function PASAR(api, Options) { //{{{
                 ])
             );
             if (! me.Prefs.noHelp) {
-                me.indexFiltersHelp (fltHelp, outputFilters, method);
+                me.indexFilters (fltIndex, outputFilters, method);
             };//}}}
-
-            if (! me.Prefs.noLib) me.exposeCallable (//{{{
-                fName
-                , rtHandler
-                , method
-                , outputFilters
-            );//}}}
 
             var requestMapper = Util.pick([//{{{
                 [spc.requestMapper, method],
@@ -119,6 +110,13 @@ function PASAR(api, Options) { //{{{
                 [Auth.defaultHandler] // Default.
             ], Util.duckFn);//}}}
 
+            if (! me.Prefs.noLib) me.exposeCallable (//{{{
+                fName
+                , rtHandler
+                , method
+                , outputFilters
+            );//}}}
+
             // Append main route://{{{
             me.buildHandler(
                 rtPath
@@ -147,10 +145,14 @@ function PASAR(api, Options) { //{{{
             };//}}}
 
         });
+        // -------------------------------- //}}}
+
+        // Build service/facility routes: //{{{
+        // ------------------------------
 
         // Build help item route://{{{
         if (! me.Prefs.noHelp) {
-            spc.help = me.hlpAutocomplete(spc, rtPath, fltHelp);
+            spc.help = me.hlpAutocomplete(spc, rtPath, fltIndex);
 
             me.buildHandler(
                 // Using buildHandler ensures consistent behaviour.
@@ -180,8 +182,13 @@ function PASAR(api, Options) { //{{{
 
         };//}}}
 
+        // ------------------------------ //}}}
 
     };
+    // ================================//}}}
+
+    // Build all /facility routes://{{{
+    // ---------------------------
 
     // Build help index route://{{{
     if (! me.Prefs.noHelp) {
@@ -220,6 +227,8 @@ function PASAR(api, Options) { //{{{
         );
     };//}}}
 
+    // ---------------------------//}}}
+
     // Shorthand for single-method functions://{{{
     if (! me.Prefs.noLib) Object.keys(me.R.fn).filter(function(k){
         var methods = Object.keys(me.R.fn[k]);
@@ -237,6 +246,7 @@ function PASAR(api, Options) { //{{{
     });//}}}
 
     return me.R;
+
 };//}}}
 
 PASAR.prototype.buildHandler = function buildHandler(//{{{
@@ -318,7 +328,7 @@ PASAR.prototype.buildHandler = function buildHandler(//{{{
 
 };//}}}
 
-PASAR.prototype.indexFiltersHelp = function (target, fdata, method) {//{{{
+PASAR.prototype.indexFilters = function (target, fdata, method) {//{{{
     for (var ext in fdata) {
         var contents = fdata[ext].help;
         if (! contents) contents = ext + " output formatter"; // Description failback.
@@ -332,7 +342,7 @@ PASAR.prototype.indexFiltersHelp = function (target, fdata, method) {//{{{
     };
 };//}}}
 
-PASAR.prototype.hlpAutocomplete = function hlpAutocompleter(src, fnPath, fltHelp) {//{{{
+PASAR.prototype.hlpAutocomplete = function hlpAutocompleter(src, fnPath, fltIndex) {//{{{
 
     var me = this;
     var hlp = src.help;
@@ -345,7 +355,7 @@ PASAR.prototype.hlpAutocomplete = function hlpAutocompleter(src, fnPath, fltHelp
     hlp.meta = src.meta;
     hlp.path = fnPath;
     hlp.prefs = me.Prefs.client;
-    hlp.filters = fltHelp;
+    hlp.filters = fltIndex;
 
     if (! hlp.meta) hlp.meta = {};
     if (! hlp.contents) hlp.contents = "";

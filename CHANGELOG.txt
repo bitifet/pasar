@@ -2,6 +2,9 @@ CHANGELOG.txt
 =============
 
 
+    Added links for each available output filter in help examples.
+    Markdown syntax fixings for README.md and doc/Manual.md
+
 "version": "0.0.10",
     Implemented Output Filters extendability.
     Added automated filters help (thought service /help facility).

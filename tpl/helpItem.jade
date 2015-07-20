@@ -67,3 +67,7 @@ html
                             b.
                                 (#{e.method})&nbsp;
                             a(href=e.url, title=e.comments)= e.label
+                            each fitems, ext in filters
+                                - var m = "["+ext+"]";
+                                span &nbsp;
+                                a(href=e.url+"."+ext, title=ext)= m

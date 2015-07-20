@@ -112,28 +112,28 @@ Api specification consists in an object in the form:
 
 Each service specification consists of one or more of the below properties:
 
-###<a name="spcMethods"></a>[\_get, \_post, \_put, \_delete, \_all] method implementations.
+### <a name="spcMethods"></a>[\_get, \_post, \_put, \_delete, \_all] method implementations.
 
 FIXME
 
 
-###<a name="spcPath"></a>path
+### <a name="spcPath"></a>path
 
 Route path specification (defaults to /serviceName if not specified). Inital slash is automatically prepended if missing.
 
 
-###<a name="spcHelp"></a>help
+### <a name="spcHelp"></a>help
 
 FIXME
 
 
-###<a name="spcMeta"></a>meta
+### <a name="spcMeta"></a>meta
 
 FIXME
 
 
 
-###<a name="spcAuthHandler"></a>authHandler
+### <a name="spcAuthHandler"></a>authHandler
 
 Let to override default Authentication Handler.
 
@@ -142,12 +142,12 @@ See "Default Authentication Handler implementation" in [auth.js](../lib/auth.js)
 FIXME: Make a more detailed documentation.
 
 
-###<a name="spcAc"></a>ac
+### <a name="spcAc"></a>ac
 
 FIXME
 
 
-###<a name="spcFilters"></a>outputFilters
+### <a name="spcFilters"></a>outputFilters
 
 
 Allow to alter available output filters for whole service or for specific method. See [Overridable Output Filters](#advFilters) in [Advanced Features](#advFeatures) section.
@@ -155,12 +155,12 @@ Allow to alter available output filters for whole service or for specific method
 FIXME...
 
 
-###<a name="spcRequestMapper"></a>requestMapper
+### <a name="spcRequestMapper"></a>requestMapper
 
 FIXME
 
 
-###<a name="spcResponseMapper"></a>responseMapper
+### <a name="spcResponseMapper"></a>responseMapper
 
 FIXME
 
@@ -197,7 +197,7 @@ For example:
     };
 
 
-###<a name="optDisabling"></a>Feature-disabling Options:
+### <a name="optDisabling"></a>Feature-disabling Options:
 
 noLib (boolean, default = false)
 : Disables .fn and .syncFn facilites.
@@ -209,14 +209,14 @@ noFilters (boolean, default = false)
 : Disables optional formatting filters.
 
 
-###<a name="optDefaults"></a>"defaults" Option:
+### <a name="optDefaults"></a>"defaults" Option:
 
 "defaults" Option can be used to define default values to be merged with all Service definitons.
 
 Not fully functional yet. But, for example, allows to define defaults.help.examples.all as ``[{}]``.
 
 
-###<a name="optClient"></a>"client" Option:
+### <a name="optClient"></a>"client" Option:
 
 "client" option let's to override some client-side preferences used by special views templates (like help or form views).
 
@@ -226,7 +226,7 @@ jQuery
 : Defaults to googleApis jQuery path. But you may want to override it if you haven't Internet access or prefer to serve your own stored copy.
 
 
-###<a name="optMisc"></a>Miscellaneous Options:
+### <a name="optMisc"></a>Miscellaneous Options:
 
 
 promiseEngine
@@ -246,13 +246,13 @@ defaultFilter
 FIXME
 
 
-###<a name="advAuthHandling"></a>Authentication handling
+### <a name="advAuthHandling"></a>Authentication handling
 
 
 FIXME
 
 
-###<a name="advFilters"></a>Overridable output filters
+### <a name="advFilters"></a>Overridable output filters
 
 
 PASAR comes by default with some available output filters.
@@ -281,7 +281,7 @@ Each filter definition can be:
 
 
 
-####<a name=""></a>New Output Filter implementation:
+#### <a name=""></a>New Output Filter implementation:
 
 To implement new output filters you should use below template:
 
@@ -331,13 +331,13 @@ To implement new output filters you should use below template:
 FIXME...
 
 
-###<a name="advFn"></a>Local library function access (Promises): fn
+### <a name="advFn"></a>Local library function access (Promises): fn
 
 
 FIXME
 
 
-###<a name="advSyncFn"></a>Synchronous local library function access: syncFn
+### <a name="advSyncFn"></a>Synchronous local library function access: syncFn
 
 
 FIXME
