@@ -100,8 +100,8 @@ Response Mapper
 Facility
 :   Facilities are fully automated extra functionalities over all Services (accessed thought *serviceUrl*/*facilityName*) and/or over the whole API (accessed thought /*facilityName*/. The only currently implemented facility is /help.
 
-Export Filters
-:   Export Filters (or Export Formatters) let all our services output to be exported to distinct output formats, such as csv, html, etc... SIMPLY adding corresponding extension (.csv, .html...) to the original service url.
+Output Filters
+:   Output Filters (or Output Formatters) let all our services output to be exported to distinct output formats, such as csv, html, etc... SIMPLY adding corresponding extension (.csv, .html...) to the original service url.
 
 
 ###<a name="abstractNotes"></a>Notes

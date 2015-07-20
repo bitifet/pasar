@@ -147,6 +147,14 @@ FIXME: Make a more detailed documentation.
 FIXME
 
 
+###<a name="spcFilters"></a>outputFilters
+
+
+Allow to alter available output filters for whole service or for specific method. See [Overridable Output Filters](#advFilters) in [Advanced Features](#advFeatures) section.
+
+FIXME...
+
+
 ###<a name="spcRequestMapper"></a>requestMapper
 
 FIXME
@@ -203,9 +211,9 @@ noFilters (boolean, default = false)
 
 ###<a name="optDefaults"></a>"defaults" Option:
 
-"defaults" Option let's define default values to be merged with all Service definitons.
+"defaults" Option can be used to define default values to be merged with all Service definitons.
 
-Not fully functional yet. But let's define defaults.help.examples.get as ``[{}]``.
+Not fully functional yet. But, for example, allows to define defaults.help.examples.all as ``[{}]``.
 
 
 ###<a name="optClient"></a>"client" Option:
@@ -220,27 +228,117 @@ jQuery
 
 ###<a name="optMisc"></a>Miscellaneous Options:
 
+
 promiseEngine
-: Let's to provide your own Promise engine.
+: Allow to provide your own Promise engine.
+
+outputFilters
+: Allow to alter available output filters globally. See [Overridable Output Filters](#advFilters) in [Advanced Features](#advFeatures) section.
+
+defaultFilter
+: Allow to change default output filter. See [Overridable Output Filters](#advFilters) in [Advanced Features](#advFeatures) section.
 
 
 <a name="advFeatures"></a>Advanced Features
 -------------------------------------------
+
 
 FIXME
 
 
 ###<a name="advAuthHandling"></a>Authentication handling
 
+
 FIXME
 
 
+###<a name="advFilters"></a>Overridable output filters
+
+
+PASAR comes by default with some available output filters.
+
+All request ouput are filtered thought one output filter. Output filters are selected by adding a "file extension" to the default route of the actual route path.
+
+When not specified, default filter (json if not overrided thought *defaultFilter* [option](#optMisc)) is used.
+
+Available filters are defined in [lib/formatters.js]() in coreFilters variable.
+
+Filters can optionally accept a configuration object to alter their behaviour, can be each fully redefined, and reused with diferent options thought distinct extension. And that can be done globally, per service, or for a specific method of given service.
+
+To do that, you can use *outputFilters* [option](#optMisc) and / or [specification property](#spcFilters) consisting in javascript object with as many "extension: filter_definition" pairs as needed.
+
+Each filter definition can be:
+
+  * Boolean false to disable filter addressed by that extension.
+
+  * Options object to reconfigure existing filter.
+
+  * Function implementing new filter.
+
+  * String addressing existing filter.
+
+  * Array [fltName, options] or [function, options] combining those wiht options.
+
+
+
+####<a name=""></a>New Output Filter implementation:
+
+To implement new output filters you should use below template:
+
+
+```javascript
+    var myOutputFilter = function(setupOptions){
+
+        // Here you can do some intialization work.
+        // If necessary, you can return fully distinct filtering function
+        // depending on provided setupOptions. Or, instead, simply ignore it.
+
+        function myFilter( // Actual filtering function.
+            input               // {data: _actual_input_data_, meta: _some_metadata_}
+            , runtimeOptions    // Optional runtime options.
+        ){
+
+            var output;
+            // Do some stuff to propperly format input in output variable...
+            return {
+                ctype: "text/html", // Content type for your output.
+                data: output
+            };
+        }
+
+        // NOTE: runtimeOptions are undefined by default because output
+        // formatting are not exected to change it's behaviour depending on
+        // request parameters. But you change this behaviour by
+        // defining a requestHandler for your output filter like this:
+        //
+        // myFilter.requestHandler = function(req) {
+        //     // If defined, this request handler will be called with actual
+        //     // request object and it's output will be passed to the filter
+        //     // as a second parameter.
+        //
+        //     var myRuntimeOptions;
+        //     // Extract desired data from request and propperly set myRuntimeOptions.
+        //     return myRuntimeOptions.
+        // };
+
+
+        return myFilter;
+    };
+```
+
+
+
+FIXME...
+
+
 ###<a name="advFn"></a>Local library function access (Promises): fn
+
 
 FIXME
 
 
 ###<a name="advSyncFn"></a>Synchronous local library function access: syncFn
+
 
 FIXME
 
