@@ -11,17 +11,14 @@
 "use strict";
 var Path = require("path");
 var Express = require("express");
-var Url = require("url");
 var Cfg = require("./cfg.js");
 var Util = require("./lib/util.js");
 var Auth = require("./lib/auth.js");
 var Fmt = require("./lib/formatters.js");
 var defaultRequestMapper = require("./lib/defaultRequestMapper.js");
 var defaultResponseMapper = require("./lib/defaultResponseMapper.js");
-
-var Tpl = {
-    helpIndex: Util.tpl("helpIndex.jade"),
-    helpItem: Util.tpl("helpItem.jade"),
+var Facilities = {
+    help: require("./lib/facilities/help.js"),
 };
 
 function PASAR(api, Options) { //{{{
@@ -150,37 +147,34 @@ function PASAR(api, Options) { //{{{
         // Build service/facility routes: //{{{
         // ------------------------------
 
-        // Build help item route://{{{
-        if (! me.Prefs.noHelp) {
-            spc.help = me.hlpAutocomplete(spc, rtPath, fltIndex);
+        var facilityAuthHandler =  Util.pick([ // Authentication Handler. //{{{
+            [spc.authHandler, "all"],
+            [spc.authHandler],
+            [me.Prefs.defaults, "authHandler.all"],
+            [me.Prefs.defaults, "authHandler"],
+            [Auth.defaultHandler] // Default.
+        ], Util.duckFn);//}}}
+        var facilityAC = Util.pick([ // Access Control properties. //{{{
+            [spc.ac],
+            [me.Prefs.ac],
+            {}
+        ], Util.duckFn);//}}}
+        Object.keys(Facilities).map(function(f){//{{{
 
-            me.buildHandler(
-                // Using buildHandler ensures consistent behaviour.
-                rtPath + "/help"
-                , '/help'           // Facility name.
-                , Tpl.helpItem      // Directly injected Output formatter.
-                , spc.help          // Actual input.
-                , null              // No request handler.
-                , function(input , outputFilter , res , next) {
-                    res.header("Content-Type", "text/html");
-                    res.send(outputFilter(input));
-                }
-                , Util.pick([ // Authentication Handler. //{{{
-                    [spc.authHandler, "all"],
-                    [spc.authHandler],
-                    [me.Prefs.defaults, "authHandler.all"],
-                    [me.Prefs.defaults, "authHandler"],
-                    [Auth.defaultHandler] // Default.
-                ], Util.duckFn)//}}}
-                , Util.pick([ // Access Control properties. //{{{
-                    [spc.ac],
-                    [me.Prefs.ac],
-                    {}
-                ], Util.duckFn)//}}}
-                , spc.ac                // Access Control data (from specification).
+            // Handle me.Prefs.noHelp, .noForm, etc...
+            if (me.Prefs["no" + f[0].toUpperCase() + f.substring(1)]) return;
+
+            me.buildFacility(
+                rtPath,
+                f,
+                spc,
+                Facilities[f],
+                fltIndex,
+                facilityAuthHandler,
+                facilityAC
             );
 
-        };//}}}
+        });//}}}
 
         // ------------------------------ //}}}
 
@@ -189,43 +183,33 @@ function PASAR(api, Options) { //{{{
 
     // Build all /facility routes://{{{
     // ---------------------------
+    var facilityAuthHandler = Util.pick([ // Authentication Handler. //{{{
+        [spc.authHandler, "all"],
+        [spc.authHandler],
+        [me.Prefs.defaults, "authHandler.all"],
+        [me.Prefs.defaults, "authHandler"],
+        [Auth.defaultHandler] // Default.
+    ], Util.duckFn);//}}}
+    var facilityAC = Util.pick([ // Access Control properties. //{{{
+        [me.Prefs.ac],
+        {}
+    ], Util.duckFn);//}}}
 
-    // Build help index route://{{{
-    if (! me.Prefs.noHelp) {
-        me.buildHandler(
-            // Using buildHandler ensures consistent behaviour.
-            "/help"
-            , '/help'           // Facility name.
-            , Tpl.helpIndex     // Directly injected Output formatter.
-            , Util.dumbFn
-            , function(req, method) {
-                return {
-                    path: Path.dirname(req.uri.pathname),
-                    prefs: me.Prefs.client,
-                    fn: Object.keys(api).map(function(rtPath){return api[rtPath].help;}),
-                };
-            }
-            , function(input , outputFilter , res , next) {
-                input.then(function(data){
-                    res.header("Content-Type", "text/html");
-                    res.send(outputFilter(data));
-                }).catch(function(err){
-                    Util.sendStatusMessage("error", err);
-                });
-            }
-            , Util.pick([ // Authentication Handler. //{{{
-                [spc.authHandler, "all"],
-                [spc.authHandler],
-                [me.Prefs.defaults, "authHandler.all"],
-                [me.Prefs.defaults, "authHandler"],
-                [Auth.defaultHandler] // Default.
-            ], Util.duckFn)//}}}
-            , Util.pick([ // Access Control properties. //{{{
-                [me.Prefs.ac],
-                {}
-            ], Util.duckFn)//}}}
+    Object.keys(Facilities).map(function(f){//{{{
+
+        // Handle me.Prefs.noHelp, .noForm, etc...
+        if (me.Prefs["no" + f[0].toUpperCase() + f.substring(1)]) return;
+
+        me.buildRootFacility(
+            api,
+            f,
+            Facilities[f],
+            facilityAuthHandler,
+            facilityAC
         );
-    };//}}}
+
+    });//}}}
+
 
     // ---------------------------//}}}
 
@@ -342,93 +326,73 @@ PASAR.prototype.indexFilters = function (target, fdata, method) {//{{{
     };
 };//}}}
 
-PASAR.prototype.hlpAutocomplete = function hlpAutocompleter(src, fnPath, fltIndex) {//{{{
+PASAR.prototype.buildFacility = function buildFacility(//{{{
+    rtPath
+    , fName
+    , spc
+    , facility
+    , fltIndex
+    , authHandler
+    , ac
+) {
 
     var me = this;
-    var hlp = src.help;
 
-    if (typeof hlp == "string") {
-        hlp = {contents: hlp};
-    } else if (hlp === undefined) {
-        hlp = {};
-    };
-    hlp.meta = src.meta;
-    hlp.path = fnPath;
-    hlp.prefs = me.Prefs.client;
-    hlp.filters = fltIndex;
+    spc[fName] = facility.modelParser(me.Prefs, spc, rtPath, fltIndex);
 
-    if (! hlp.meta) hlp.meta = {};
-    if (! hlp.contents) hlp.contents = "";
-
-    if (! hlp.brief) hlp.brief = Util.txtCut(hlp.contents, Cfg.tplBriefLength);
-
-    for (var i in hlp) {
-        switch(i){
-        // Text fields:
-        case "brief":
-            break;
-        // Html fields:
-        default:
-            hlp[i] = Util.nl2br(hlp[i]);
-        };
-    };
-
-
-    hlp.methods = Util.mapMethods (//{{{
-        src,
-        hlp.methods,
-        "(undocumented)",
-        function expandMethodHelp(value, implemented) {
-            return {
-                description: value,
-                implemented: implemented,
-            };
+    me.buildHandler(
+        // Using buildHandler ensures consistent behaviour.
+        rtPath + "/"+fName
+        , "/"+fName           // Facility name.
+        , facility.tpl.item   // Directly injected Output formatter.
+        , spc[fName]          // Actual input.
+        , null                // No request handler.
+        , function(input , outputFilter , res , next) {
+            res.header("Content-Type", "text/html");
+            res.send(outputFilter(input));
         }
-    );//}}}
+        , authHandler
+        , ac
+    );
 
-
-    Util.propSet(hlp, "examples", Util.propGet(me.Prefs, "defaults.help.examples")); // Get defaults.
-
-    hlp.examples = Util.mapMethods (//{{{
-        src,
-        hlp.examples,
-        undefined,
-        function expandMethodExamples(input, implemented, method) {
-            if (input === undefined) return;
-            var output = [];
-            for (var i in input) {
-                if (input[i] instanceof Array) {
-                    var lbl = input[i][0];
-                    var prm = input[i][1];
-                    var comments = input[i][2];
-                } else {
-                    var prm = input[i];
-                    var comments = '';
-                };
-                var url = method == "get"
-                    ? Url.format({
-                        pathname: ".." + hlp.path,
-                        query: prm,
-                    })
-                    : "#"
-                ;
-                if (typeof lbl === "object" || ! lbl) lbl = url.substring(2);
-
-                output.push({
-                    method: method,
-                    label: lbl,
-                    prm: prm,
-                    comments: comments,
-                    url: url,
-                });
-            };
-            return output;
-        }
-    );//}}}
-
-    return hlp;
 };//}}}
-    
+
+PASAR.prototype.buildRootFacility = function buildRootFacility (//{{{
+    spc,
+    fName,
+    facility,
+    authHandler,
+    ac
+) {
+    var me = this;
+
+    me.buildHandler(
+        // Using buildHandler ensures consistent behaviour.
+        "/"+fName
+        , "/"+fName            // Facility name.
+        , facility.tpl.index   // Directly injected Output formatter.
+        , Util.dumbFn
+        , function(req, method) {
+            return {
+                path: Path.dirname(req.uri.pathname),
+                prefs: me.Prefs.client,
+                fn: Object.keys(spc).map(function(rtPath){return spc[rtPath][fName];}),
+            };
+        }
+        , function(input , outputFilter , res , next) {
+            input.then(function(data){
+                res.header("Content-Type", "text/html");
+                res.send(outputFilter(data));
+            }).catch(function(err){
+                Util.sendStatusMessage("error", err);
+            });
+        }
+        , authHandler
+        , ac
+    );
+
+};//}}}
+
 PASAR.prototype.buildPrefs = function applyDefaultPreferences(Options) {//{{{
 
     // Sanityze options:
