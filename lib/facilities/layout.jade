@@ -1,0 +1,25 @@
+doctype html
+html
+  head
+    title.
+        #{path} (#{title})
+    style.
+        nav.menu {
+            top: 0px;
+            float: right;
+        }
+        nav.menu a {
+            padding: .5em;
+            background: #eeeeff;
+            border: #0066aa solid 1px;
+            border-right: #004466 solid 3px;
+            border-bottom: #004466 solid 3px;
+        }
+        nav.menu a:hover {
+            border: #0066aa solid 3px;
+            border-right: #004466 solid 1px;
+            border-bottom: #004466 solid 1px;
+        }
+    script(src=prefs.jQuery)
+  body
+    block contents

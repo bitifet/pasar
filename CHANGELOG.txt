@@ -6,6 +6,7 @@ CHANGELOG.txt
     Markdown syntax fixings for README.md and doc/Manual.md
     Facilities modularization.
     BUGFIX: Fixed wrong facility rejection handling.
+    Common template layout for facilities.
 
 "version": "0.0.10",
     Implemented Output Filters extendability.

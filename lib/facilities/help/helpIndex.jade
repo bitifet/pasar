@@ -1,10 +1,7 @@
-doctype html
-- var pageTitle = "API function Index for " + path;
-html
-  head
-    title= pageTitle
-  body
-    h1= pageTitle
+extends ../layout.jade
+- var title = "API function Index for " + path;
+block contents
+    h1= title
     ul
         each f in fn
             - var url = f.path.substring(1) + "/" + name;
