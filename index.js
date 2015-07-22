@@ -386,7 +386,7 @@ PASAR.prototype.buildRootFacility = function buildRootFacility (//{{{
                 res.header("Content-Type", "text/html");
                 res.send(outputFilter(data));
             }).catch(function(err){
-                Util.sendStatusMessage("error", err);
+                Util.sendStatusMessage(res, "error", err);
             });
         }
         , authHandler
