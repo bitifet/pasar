@@ -1,0 +1,15 @@
+doctype html
+- var pageTitle = "API function Index for " + path;
+html
+  head
+    title= pageTitle
+  body
+    h1= pageTitle
+    ul
+        each f in fn
+            - var url = f.path.substring(1) + "/" + name;
+            li
+                b
+                    a(href=url)= f.path
+                span.
+                    :&nbsp;#{f.brief}

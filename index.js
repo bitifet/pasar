@@ -18,7 +18,8 @@ var Fmt = require("./lib/formatters.js");
 var defaultRequestMapper = require("./lib/defaultRequestMapper.js");
 var defaultResponseMapper = require("./lib/defaultResponseMapper.js");
 var Facilities = {
-    help: require("./lib/facilities/help.js"),
+    help: require("./lib/facilities/help"),
+    form: require("./lib/facilities/form"),
 };
 
 function PASAR(api, Options) { //{{{
@@ -338,7 +339,7 @@ PASAR.prototype.buildFacility = function buildFacility(//{{{
 
     var me = this;
 
-    spc[fName] = facility.modelParser(me.Prefs, spc, rtPath, fltIndex);
+    spc[fName] = facility.modelParser(me.Prefs, spc, rtPath, fName, fltIndex);
 
     me.buildHandler(
         // Using buildHandler ensures consistent behaviour.
@@ -375,6 +376,7 @@ PASAR.prototype.buildRootFacility = function buildRootFacility (//{{{
         , function(req, method) {
             return {
                 path: Path.dirname(req.uri.pathname),
+                name: fName,
                 prefs: me.Prefs.client,
                 fn: Object.keys(spc).map(function(rtPath){return spc[rtPath][fName];}),
             };

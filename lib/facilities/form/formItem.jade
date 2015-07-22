@@ -1,0 +1,76 @@
+doctype html
+html
+  head
+    title.
+        #{path} (#{meta.title})
+    style.
+        nav.menu {
+            top: 0px;
+            float: right;
+        }
+        nav.menu a {
+            padding: .5em;
+            background: #eeeeff;
+            border: #0066aa solid 1px;
+            border-right: #004466 solid 3px;
+            border-bottom: #004466 solid 3px;
+        }
+        nav.menu a:hover {
+            border: #0066aa solid 3px;
+            border-right: #004466 solid 1px;
+            border-bottom: #004466 solid 1px;
+        }
+
+  body
+    nav.menu
+        a(href="../"+name) Index
+    h1= meta.title
+    div
+        h2 Function path:
+        p= path
+    div
+        h2 Description:
+        p.
+            !{contents}
+    div
+        h2 Valid methods:
+        ul
+            each m, name in methods
+                li
+                    b.
+                        #{name}:&nbsp;
+                    span= m.description
+                        if ! m.implemented
+                            b.
+                                &nbsp;(UNIMPLEMENTED)
+    if Object.keys(filters).length
+        div
+            h2 Available Filters:
+            ul
+                each fitems, ext in filters
+                    each fdata, k in fitems
+                        li
+                            b.
+                                .#{ext}:&nbsp;
+                            span= fdata.contents
+                            - var m = "["+fdata.methods.join(", ")+"]";
+                            b.
+                                &nbsp;#{m}
+                            
+    if Object.keys(examples).length
+        div
+            h2 Examples:
+                ul
+                  each eBlock, method in examples
+                    each e, i in eBlock
+                        li
+                            b.
+                                (#{e.method})&nbsp;
+                            a(href=e.url, title=e.comments)= e.label
+                            each fitems, ext in filters
+                                - var m = "["+ext+"]";
+                                span &nbsp;
+                                a(href=e.url+"."+ext, title=ext)= m
+    script(src=prefs.jQuery)
+    script.
+        $("body").css("background", "#ff0000");

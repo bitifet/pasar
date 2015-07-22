@@ -7,7 +7,7 @@ html
     h1= pageTitle
     ul
         each f in fn
-            - var url = f.path.substring(1) + "/help";
+            - var url = f.path.substring(1) + "/" + name;
             li
                 b
                     a(href=url)= f.path
