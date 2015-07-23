@@ -27,6 +27,7 @@ function PASAR(api, Options) { //{{{
     var me = this;
     me.R = Express.Router();                // Create new router.
     me.Prefs = this.buildPrefs(Options);    // Initialyze preferences.
+    me.facilities = {};                     // Facility models.
     me.R.Promise = me.Prefs.promiseEngine   // Pick for Promise engine.//{{{
         ? me.Prefs.promiseEngine
         : require('promise')
@@ -49,7 +50,7 @@ function PASAR(api, Options) { //{{{
         var spc = api[srvName];                // Function full specification.
         var fltIndex = {};
 
-        var rtPath = (function guessRoutePath(srvName, spc) { // Resolve route path.//{{{
+        spc.path = (function guessRoutePath(srvName, spc) { // Resolve route path.//{{{
             var rtPath = spc.path; // Let to specify complete route Path without messing service name.
             if (rtPath === undefined) rtPath = srvName; // Default to service name if not provided.
             if (rtPath[0] !== "/") rtPath = "/" + rtPath; // Fix starting slash when missing.
@@ -117,7 +118,7 @@ function PASAR(api, Options) { //{{{
 
             // Append main route://{{{
             me.buildHandler(
-                rtPath
+                spc.path
                 , method
                 , me.defaultFilter
                 , rtHandler
@@ -131,7 +132,7 @@ function PASAR(api, Options) { //{{{
             // Append routes for all available output filters://{{{
             if (! me.Prefs.noFilters) for (var ext in outputFilters) {
                 me.buildHandler(
-                    rtPath
+                    spc.path
                     , method
                     , [outputFilters[ext], ext]
                     , rtHandler
@@ -166,7 +167,7 @@ function PASAR(api, Options) { //{{{
             if (me.Prefs["no" + f[0].toUpperCase() + f.substring(1)]) return;
 
             me.buildFacility(
-                rtPath,
+                srvName,
                 f,
                 spc,
                 Facilities[f],
@@ -328,8 +329,8 @@ PASAR.prototype.indexFilters = function (target, fdata, method) {//{{{
 };//}}}
 
 PASAR.prototype.buildFacility = function buildFacility(//{{{
-    rtPath
-    , fName
+    srvName
+    , facName
     , spc
     , facility
     , fltIndex
@@ -339,14 +340,15 @@ PASAR.prototype.buildFacility = function buildFacility(//{{{
 
     var me = this;
 
-    spc[fName] = facility.modelParser(me.Prefs, spc, rtPath, fName, fltIndex);
+    if (me.facilities[facName] === undefined) me.facilities[facName] = {};
+    me.facilities[facName][srvName] = facility.itemParser(me.Prefs, spc, srvName, facName, fltIndex);
 
     me.buildHandler(
         // Using buildHandler ensures consistent behaviour.
-        rtPath + "/"+fName
-        , "/"+fName           // Facility name.
+        spc.path + "/"+facName
+        , "/"+facName           // Facility name.
         , facility.tpl.item   // Directly injected Output formatter.
-        , spc[fName]          // Actual input.
+        , me.facilities[facName][srvName]          // Actual input.
         , null                // No request handler.
         , function(input , outputFilter , res , next) {
             res.header("Content-Type", "text/html");
@@ -360,26 +362,27 @@ PASAR.prototype.buildFacility = function buildFacility(//{{{
 
 PASAR.prototype.buildRootFacility = function buildRootFacility (//{{{
     spc,
-    fName,
+    facName, // Facility name.
     facility,
     authHandler,
     ac
 ) {
     var me = this;
-
     me.buildHandler(
         // Using buildHandler ensures consistent behaviour.
-        "/"+fName
-        , "/"+fName            // Facility name.
+        "/"+facName
+        , "/"+facName
         , facility.tpl.index   // Directly injected Output formatter.
         , Util.dumbFn
         , function(req, method) {
-            return {
+            var model = {
                 path: Path.dirname(req.uri.pathname),
-                name: fName,
+                name: facName,
                 prefs: me.Prefs.client,
-                fn: Object.keys(spc).map(function(rtPath){return spc[rtPath][fName];}),
+                fn: Object.keys(spc).map(function(srvName){return me.facilities[facName][srvName];}),
             };
+            model.title = facility.buildTitle(model);
+            return model;
         }
         , function(input , outputFilter , res , next) {
             input.then(function(data){
@@ -430,7 +433,7 @@ PASAR.prototype.exposeCallable = (function(){//{{{
         };
     };//}}}
 
-    return function buildCallable(fName, handler, method, Filters){ // Expose handler as callable function://{{{
+    return function buildCallable(srvName, handler, method, Filters){ // Expose handler as callable function://{{{
 
         var me = this;
 
@@ -440,22 +443,22 @@ PASAR.prototype.exposeCallable = (function(){//{{{
         };
 
         // With default output filter:
-        if (me.R.fn[fName] === undefined) {
-            me.R.fn[fName] = {};
-            me.R.syncFn[fName] = {};
+        if (me.R.fn[srvName] === undefined) {
+            me.R.fn[srvName] = {};
+            me.R.syncFn[srvName] = {};
         };
-        me.R.fn[fName][method] = buildFunction(me.R, handler, me.defaultFilter);
-        me.R.syncFn[fName][method] = Util.depromise(me.R.fn[fName][method]);
+        me.R.fn[srvName][method] = buildFunction(me.R, handler, me.defaultFilter);
+        me.R.syncFn[srvName][method] = Util.depromise(me.R.fn[srvName][method]);
 
         // For all available filters:
         if (! me.Prefs.noFilters) for (var ext in Filters) {
-            if (me.R.fn[fName+"."+ext] === undefined) {
-                me.R.fn[fName+"."+ext] = {};
-                me.R.syncFn[fName+"."+ext] = {};
+            if (me.R.fn[srvName+"."+ext] === undefined) {
+                me.R.fn[srvName+"."+ext] = {};
+                me.R.syncFn[srvName+"."+ext] = {};
             };
             var f = buildFunction(me.R, handler, Filters[ext]);
-            me.R.fn[fName+"."+ext][method] = f;
-            me.R.syncFn[fName+"."+ext][method] = Util.depromise(f);
+            me.R.fn[srvName+"."+ext][method] = f;
+            me.R.syncFn[srvName+"."+ext][method] = Util.depromise(f);
         };
 
     }; //}}}
