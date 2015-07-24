@@ -1,5 +1,29 @@
 extends ../layout.jade
 
+append head
+    style. //- {{{
+        textarea {
+            width: 100%;
+            min-height: 15em;
+        }
+        div.form div.controls {
+            text-align:right;
+        }
+        div.form div.controls p {
+            display: inline;
+            padding-left: .5em;
+            border-left: solid #222288 2px;
+            margin-left: 1em;
+        }
+        p.info {
+            cursor: help;
+        }
+        header button#clearResults {
+            float: right;
+            display: none;
+        };
+    //- }}}
+
 block contents
     nav.menu
         a(href="../"+name) Index
@@ -7,40 +31,150 @@ block contents
         #{meta.title} Form (#{path})
     div.tabs
         ul
-            each m, name in methods
+            each f, name in methods
                 li(data-id=name)= name.toUpperCase()
         div
-            each m, name in methods
-                div(data-id=name)
-                    if ! m.implemented
-                        h2 UNIMPLEMENTED
-                    else
-                        div
-                            h2= name
-                            p.
-                                !{contents}
-                        div
-                            h2 Valid methods:
-                            ul
-                                each m, name in methods
-                                    li
-                                        b.
-                                            #{name}:&nbsp;
-                                        span= m.description
-                                            if ! m.implemented
-                                                b.
-                                                    &nbsp;(UNIMPLEMENTED)
-                        if Object.keys(filters).length
-                            div
-                                h2 Available Filters:
-                                ul
-                                    each fitems, ext in filters
-                                        each fdata, k in fitems
-                                            li
-                                                b.
-                                                    .#{ext}:&nbsp;
-                                                span= fdata.contents
-                                                - var m = "["+fdata.methods.join(", ")+"]";
-                                                b.
-                                                    &nbsp;#{m}
-                                                
+            each f, name in methods
+                div.form(data-id=name, data-path=path data-method=name)
+                    div.fields
+                        !{f.tpl}
+                    div.controls
+                        if f.error
+                            p.error= f.error
+                        if f.isDefault
+                            - var hint="This is the default form template.  Use JSON data to provide your request parameters or configure specific form template in API definition.";
+                            p.info(title=hint)
+                                | (Default Form)
+                        p
+                            button.reset Reset
+                        p
+                            button.submit Submit
+        div
+            header
+                h2 Results
+                button#clearResults Clear
+            div#results
+
+    script.
+        function propSet(target, path, value) {//{{{
+            if (value === undefined) return;
+            if (!(path instanceof Array)) path = path.split(".");
+            var prop = path.shift();
+            if (path.length) {
+                if (target[prop] === undefined) target[prop] = {};
+                propSet(target[prop], path, value);
+            } else if (target[prop] === undefined) target[prop] = value;
+        };//}}}
+        var rJSON = {<!--{{{-->
+            parse: function relaxedJSONparse(input){
+                var output;
+                var firewall = "var " + ( // Minimal code injection protection:<!--{{{-->
+                    ["window", "document", "Object", "Array" , "String", "$"
+                        , "Function", "Boolean", "Symbol"
+                        , "Math", "Infinity", "RegExp"
+                        , "Number", "Date", "JSON"
+                        , "isFinite", "isNaN", "parseFloat", "parseInt"
+                        , "NaN", "undefined" , "eval", "uneval"
+                        , "decodeURI", "decodeURIComponent", "encodeURI", "encodeURIComponent"
+                        , "escape", "unescape"
+                        , "Error", "EvalError", "InternalError", "RangeError", "ReferenceError"
+                        , "SyntaxError", "TypeError", "URIError"
+                        , "Map", "Set", "WeakMap", "WeakSet"
+                        , "Int8Array", "Uint8Array", "Uint8ClampedArray"
+                        , "Int16Array", "Uint16Array", "Int32Array"
+                        , "Uint32Array", "Float32Array", "Float64Array"
+                        , "SIMD", "Intl", "ArrayBuffer", "DataView"
+                        , "Promise", "Generator", "GeneratorFunction"
+                        , "Reflect", "Proxy", "arguments"
+                        , "Iterator", "ParallelArray", "StopIteration"
+                    ]
+                    .concat(Object.keys(window))
+                    .concat(Object.keys(document))
+                ).join(", ") + ";\n";<!--}}}-->
+                // BTW, no client-side hack could achieve anything that our API funtion doesn't allow.
+                eval (firewall + 'output=' + input); // Suboptimal but convenient.
+                return output;
+            },
+        };<!--}}}-->
+        var container = $("div#results");
+        var clearBtn = $("button#clearResults")
+        clearBtn.on("click", function(){
+            container.html("");
+            clearBtn.hide();
+        });
+        $("div.form").each(function(){
+            var form = $(this);
+            var method = form.data("method");
+            var path = form.data("path");
+            var fields = $(".fields :input", form);
+            var submitBtn = $(".controls button.submit", form);
+            var resetBtn = $(".controls button.reset", form);
+
+            fields.each(function(){<!--{{{-->
+                var f = $(this);
+                var type = f.attr("type");
+                if (! type) type = "json";
+                f.data("type", type);
+                f.data("default", f.val());
+            });<!--}}}-->
+            submitBtn.on("click", function(){<!--{{{-->
+
+                // Collect input data:<!--{{{-->
+                try {
+                    var output = {};
+                    fields.each(function(){
+                        var input = $(this);
+                        var name = input.attr("name");
+                        var type = input.data("type");
+                        var value = input.val();
+                        switch(type) {
+                        case "json":
+                            if(value == "") {
+                                value = "{}";
+                                input.val(value)
+                            };
+                            value = rJSON.parse(value);
+
+                        };
+                        if (! name) {
+                            output = value;
+                        } else {
+                            propSet(output, name, value);
+                        };
+                    });
+                } catch (err) {
+                    alert("ERROR: " + err);
+                    return;
+                };<!--}}}-->
+
+                // Flush results container:
+                container.html("");
+                clearBtn.show();
+
+                // Build new fresh result target (avoids "request races"):
+                var target = $("<div></div>").appendTo(container);
+                $("<p>Requesting data from API...</p>").appendTo(target);
+
+                // Perform request:
+                $.ajax({
+                    url: ".." + path + ".html", 
+                    type: method,
+                    success: function(data){
+                        target.html(data);
+                    },
+                    error: function(err){
+                        $("<p><b>ERROR:</b></p>").appendTo(target);
+                        $("<code></code>").text(err.toString());
+                    },
+                });
+
+            });<!--}}}-->
+            resetBtn.on("click", function(){<!--{{{-->
+                fields.each(function(){
+                    var f = $(this);
+                    f.val(f.data("default"));
+                });
+            });<!--}}}-->
+
+        });
+

@@ -1,13 +1,15 @@
 CHANGELOG.txt
 =============
 
-
+"version": "1.0.0",
     Added links for each available output filter in help examples.
     Markdown syntax fixings for README.md and doc/Manual.md
     Facilities modularization.
     BUGFIX: Fixed wrong facility rejection handling.
     Common template layout for facilities.
     BUGFIX: Fixed example with parameters links when having format extension.
+    Completed /form facility implementation.
+    Released 1.0.0 version: All initially projected functionalities are implemented.
 
 "version": "0.0.10",
     Implemented Output Filters extendability.

@@ -154,6 +154,8 @@ Output Filters
     - This enables you to reuse simple functionalities as sync functions.
     - But be carefull, that THOSE ARE BLOCKING FUNCTIONS. So use at your own risk.
 
+  * Easy querying while developing with automated (but customizable) '/form' facilities.
+
 
 ### <a name="featAdvanced"></a>Advanced Features
 
@@ -223,6 +225,7 @@ All API definitions should look's like follows:
     var Options = { // Comment-out / modify as you need...
         // noLib: true,     // ...to disable .fn and .syncFn facilites.
         // noHelp: true,    // ...to disable /help facilities.
+        // noForm: true,    // ...to disable /form facilities.
         // noFilters: true, // ...to disable optional formatting filters.
         // "defaults.help.examples.get": [{}], // ...to automatically provide all your functions help with simple example.
         // "defaults.authHanlder": myAuthHandler, // ...to sepcify your own authentication handler.
@@ -359,8 +362,6 @@ Then, to mount your API REST to your Express router simply:
 
 <a name="TODO"></a> TODO
 ------------------------
-
-  * Easy querying while developing with automated (but customizable) '/form' facilities.
 
   * Posibility to execute predefined tests clientside thought /test facilities.
 

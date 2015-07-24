@@ -1,60 +1,61 @@
 doctype html
 html
   head
-    title= title
-    style.
-        /* NAV MENÚ *//*{{{*/
-        nav.menu {
-            top: 0px;
-            float: right;
-        }
-        nav.menu a {
-            padding: .5em;
-            background: #eeeeff;
-            border: #0066aa solid 1px;
-            border-right: #004466 solid 3px;
-            border-bottom: #004466 solid 3px;
-        }
-        nav.menu a:hover {
-            border: #0066aa solid 3px;
-            border-right: #004466 solid 1px;
-            border-bottom: #004466 solid 1px;
-        }
-        /*}}}*/
-        /* TABS *//*{{{*/
-        .tabs {
-            display:none;
-        }
-        .tabs>ul {
-            margin-left: 0px;
-            padding-left: 0px;
-            margin-bottom: 3px;
-        }
-        .tabs>ul li {
-            display: inline;
-            padding-left: .5em;
-            padding-right: .5em;
-            margin-right: 10px;
-            list-style-type: none;
-            border-left: #000055 solid 4px;
-            border-right-width: 3px;
-            border-bottom: #000055 solid 1px;
-        }
-        .tabs>ul li:hover {
-            border-left: #000055 solid 1px;
-            margin-right: 12px;
-        }
-        .tabs>ul li.selected {
-            background: #ccddee;
-            border-bottom: #000055 solid 3px;
-        }
-        .tabs>div {
-            border: #999999 solid 1px;
-            padding: 1em;
-            margin-top: 0px;
-        }
-        /*}}}*/
-    script(src=prefs.jQuery)
+    block head
+        title= title
+        style.
+            /* NAV MENÚ: {{{ */
+            nav.menu {
+                top: 0px;
+                float: right;
+            }
+            nav.menu a {
+                padding: .5em;
+                background: #eeeeff;
+                border: #0066aa solid 1px;
+                border-right: #004466 solid 3px;
+                border-bottom: #004466 solid 3px;
+            }
+            nav.menu a:hover {
+                border: #0066aa solid 3px;
+                border-right: #004466 solid 1px;
+                border-bottom: #004466 solid 1px;
+            }
+            /* }}} */
+            /* TABS: {{{ */
+            .tabs {
+                display:none;
+            }
+            .tabs>ul {
+                margin-left: 0px;
+                padding-left: 0px;
+                margin-bottom: 3px;
+            }
+            .tabs>ul li {
+                display: inline;
+                padding-left: .5em;
+                padding-right: .5em;
+                margin-right: 10px;
+                list-style-type: none;
+                border-left: #000055 solid 4px;
+                border-right-width: 3px;
+                border-bottom: #000055 solid 1px;
+            }
+            .tabs>ul li:hover {
+                border-left: #000055 solid 1px;
+                margin-right: 12px;
+            }
+            .tabs>ul li.selected {
+                background: #ccddee;
+                border-bottom: #000055 solid 3px;
+            }
+            .tabs>div {
+                border: #999999 solid 1px;
+                padding: 1em;
+                margin-top: 0px;
+            }
+            /* }}} */
+        script(src=prefs.jQuery)
   body
     block contents
     script.

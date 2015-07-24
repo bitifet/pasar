@@ -25,6 +25,7 @@ those concepts are also used here.
     - [[\_get, \_post, \_put, \_delete, \_all] method implementations](#spcMethods)
     - [path](#spcPath)
     - [help](#spcHelp)
+    - [form](#spcForm)
     - [meta](#spcMeta)
     - [authHandler](#spcAuthHandler)
     - [ac](#spcAc)
@@ -126,6 +127,10 @@ Route path specification (defaults to /serviceName if not specified). Inital sla
 
 FIXME
 
+### <a name="spcForm"></a>form
+
+FIXME
+
 
 ### <a name="spcMeta"></a>meta
 
@@ -204,6 +209,9 @@ noLib (boolean, default = false)
 
 noHelp (boolean, default = false)
 : Disables /help facilities.
+
+noForm (boolean, default = false)
+: Disables /form facilities.
 
 noFilters (boolean, default = false)
 : Disables optional formatting filters.
