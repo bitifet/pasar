@@ -1,6 +1,9 @@
 CHANGELOG.txt
 =============
 
+"version": "1.0.1",
+    BUGFIX: Stupidly missed to pass obtained form contents in Ajax call.
+
 "version": "1.0.0",
     Added links for each available output filter in help examples.
     Markdown syntax fixings for README.md and doc/Manual.md

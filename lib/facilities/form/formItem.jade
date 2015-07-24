@@ -119,9 +119,8 @@ block contents
             });<!--}}}-->
             submitBtn.on("click", function(){<!--{{{-->
 
-                // Collect input data:<!--{{{-->
+                var data = {}; // Collect input data:<!--{{{-->
                 try {
-                    var output = {};
                     fields.each(function(){
                         var input = $(this);
                         var name = input.attr("name");
@@ -137,9 +136,9 @@ block contents
 
                         };
                         if (! name) {
-                            output = value;
+                            data = value;
                         } else {
-                            propSet(output, name, value);
+                            propSet(data, name, value);
                         };
                     });
                 } catch (err) {
@@ -162,6 +161,7 @@ block contents
                     success: function(data){
                         target.html(data);
                     },
+                    data: data,
                     error: function(err){
                         $("<p><b>ERROR:</b></p>").appendTo(target);
                         $("<code></code>").text(err.toString());
