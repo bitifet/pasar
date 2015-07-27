@@ -1,14 +1,18 @@
 CHANGELOG.txt
 =============
 
-
+"version": "1.0.2" - More intelligent form templating.
     Let to specify from.all simply as form (shorthand).
     Allow form Jade templates to be specified as array of strings (readability).
+    Select combo-boxes recognitona as "select" input type.
+    Autoexpandable select options thought internal (or external if FQDN) API queries (thought data-from).
+    Ability to pick specific subpath, key and description.
+        Example (Jade): option(data-from="someApiFn", data-path="foo.bar.baz", data-key="keyFld", data-value="descFld")'
 
-"version": "1.0.1",
+"version": "1.0.1" - Bugfix
     BUGFIX: Stupidly missed to pass obtained form contents in Ajax call.
 
-"version": "1.0.0",
+"version": "1.0.0" - /form facilites and more
     Added links for each available output filter in help examples.
     Markdown syntax fixings for README.md and doc/Manual.md
     Facilities modularization.
@@ -18,19 +22,19 @@ CHANGELOG.txt
     Completed /form facility implementation.
     Released 1.0.0 version: All initially projected functionalities are implemented.
 
-"version": "0.0.10",
+"version": "0.0.10" - Output filters extendability.
     Implemented Output Filters extendability.
     Added automated filters help (thought service /help facility).
     Updated README and doc/Manual.md
 
-"version": "0.0.9",
+"version": "0.0.9" - Request mapper bug fixed and more.
     Wrapped controller execution thought Promise.resolve() to ensure valid promise input.
     Updated README.md and doc/Manual.md.
     Small project reorganization.
     Allowed explicit route path specification thought 'path' service specification property to avoid service name messing with complex routes.
     BUGFIX: Fixed default request mapper (no longer ignore url parameters).
 
-"version": "0.0.8",
+"version": "0.0.8" - Authentication handling and more.
     Clearer namming for request, response mappers and output formatter.
     Implemented authentication handling facilities.
     Small project modularization.
@@ -38,39 +42,39 @@ CHANGELOG.txt
     Extended buildHandler() to also manage facilities in a consistent behaviour.
     Other minor changes.
 
-"version": "0.0.7",
+"version": "0.0.7" - Improved preferences and options.
     Overridable default preferences (thought Options object).
     Client-side preferences like jQuery path to be used in facility views.
     Shorthand for partial multidimensional Options. I.e: «"foo.bar.baz": "value"» standing for «foo:{bar:{baz:"value"}}»
     Updated doc/Manual.md
 
-"version": "0.0.6",
+"version": "0.0.6" - Fixed syncFn functions and more.
     Tested and fixed syncFn (synchronous library access) capabilities.
     Let to use user specified Promise Engine thought Options.promiseEngine.
     Added manual draft (doc/Manual.md).
 
-"version": "0.0.5",
+"version": "0.0.5" - Options and fn.
     Added Options parameter and implemented some facility disabling functionalities.
     Implemented 'fn' vector to easily reuse API as a function library.
     Implemented syncFn vector.
     Updated README file.
 
-"version": "0.0.4",
+"version": "0.0.4" - Help examplea and changelog.
     Implemented help examples.
     Added this changelog.
 
-"version": "0.0.3",
+"version": "0.0.3" - Bugfix and more.
     Brief result resolution syntax.
     Fixed bug in error hanling.
 
-"version": "0.0.2",
+"version": "0.0.2" - Jade templating for faciliteis.
     Jade templating for help pages and minor fixes.
 
-"version": "0.0.1",
+"version": "0.0.1" - Some fixes.
     Changed "generator" for "builder" in README.md to avoid confussion with ES_6 generators.
     Minor fixes.
     Also fixed license version.
 
-"version": "0.0.0",
+"version": "0.0.0" - First version.
     Initial implementation.
 

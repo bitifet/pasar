@@ -141,6 +141,43 @@ FIXME
 
 FIXME
 
+#### Field Types:
+
+##### json
+
+Actually text input or textarea, but its contents will be parsed as (laxed syntax) JSON.
+
+
+##### select
+
+Select tags will be threated as special input type "select".
+
+If it has any option having "data-from" property defined, a GET query to specified url will be performed and its response will be used to produce a bunch of options which will replace the original one.
+
+This is performed following below rules:
+
+  * By default it expects a "key: value" object.
+
+  * Value is expected to be string but, if it is an object, first item is automatically picked.
+
+  * Arrays are accepted too as they are actually "key: value" objects. 
+
+  * Also, below modifier attributes are accepted to better pick required data:
+
+    - data-path: Dot-separated path to the actual property containing data to be used.
+
+    - data-key: Key (of the value object properties) to be used for the option tag id (instad of actual array/object key).
+
+    - data-value: Just like data-key, but for description (instead of picking first property as default).
+
+
+**Example (Jade):**
+
+```Jade
+    option(data-from="someApiFn", data-path="foo.bar.baz", data-key="keyFld", data-value="descFld")
+```
+
+
 
 ### <a name="spcMeta"></a>meta
 

@@ -138,8 +138,8 @@ Output Filters
     - /myRoute/someId, /myRoute/someId.ext -> Same passing some id...
     - /myRoute/facilityName -> Access to specified facility (/help, /form /test...)
     - /facilityName -> Access to specified facility index (if applies). For example:
-        - /help: Help index.
-        - /test: Run all tests (not yet implemented).
+      - /help: Help index.
+      - /test: Run all tests (not yet implemented).
 
   * Internally reusable: Services implementation can easily make use of other functions.
     - Method handlers receive JSON object with request parameters NOT request, nor response or next express objects.
@@ -155,6 +155,11 @@ Output Filters
     - But be carefull, that THOSE ARE BLOCKING FUNCTIONS. So use at your own risk.
 
   * Easy querying while developing with automated (but customizable) '/form' facilities.
+    - Accepting 'json' as input field type (being the default if unspecified).
+    - With 'select' combo-boxes options feedable thought API requests:
+      - Examples (Jade):
+        - option(data-from="someApiFn")
+        - option(data-from="someOthesApiFn", data-path="foo.bar.baz", data-key="keyFld", data-value="descFld")
 
 
 ### <a name="featAdvanced"></a>Advanced Features
