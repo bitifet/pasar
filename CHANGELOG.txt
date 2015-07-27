@@ -1,6 +1,10 @@
 CHANGELOG.txt
 =============
 
+
+    Let to specify from.all simply as form (shorthand).
+    Allow form Jade templates to be specified as array of strings (readability).
+
 "version": "1.0.1",
     BUGFIX: Stupidly missed to pass obtained form contents in Ajax call.
 
