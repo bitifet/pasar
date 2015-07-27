@@ -48,7 +48,17 @@ those concepts are also used here.
 
 To install pasar in your project you just need to type:
 
+### From NPM:
+
     npm install --save pasar
+
+
+### From GitHub:
+
+    git clone https://github.com/bitifet/pasar      # Clone repo.
+    cd pasar
+    npm install                                     # Install dependencies.
+
 
 <a name="usage"></a>Usage
 -------------------------
