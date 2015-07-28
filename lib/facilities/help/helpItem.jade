@@ -33,9 +33,9 @@ block contents
                             b.
                                 .#{ext}:&nbsp;
                             span= fdata.contents
-                            - var m = "["+fdata.methods.join(", ")+"]";
-                            b.
-                                &nbsp;#{m}
+                            - var m = fdata.methods.join(", ");
+                            b(title="Available for "+m+" methods.").
+                                &nbsp;[#{m}]
                             
     if Object.keys(examples).length
         div
@@ -47,7 +47,22 @@ block contents
                             b.
                                 (#{e.method})&nbsp;
                             a(href=e.url(), title=e.comments)= e.label
-                            each fitems, ext in filters
-                                - var m = "["+ext+"]";
+                            if (method == "get")
                                 span &nbsp;
-                                a(href=e.url(ext), title=ext)= m
+                                select.fmtExamples(style="width:8em")
+                                    option(value="",selected,disabled) Export as...
+                                    each fitems, ext in filters
+                                        - var m = ext+": "+Object.keys(fitems).filter(function(k){return fitems[k].contents}).join(", ");
+                                        option(value=e.url(ext))= m
+    script.
+        $("select.fmtExamples").each(function(){
+            var selector = $(this);
+            selector.val("");
+            selector.on("change", function(){
+                var url = selector.val();
+                if (url) {
+                    document.location = url;
+                };
+                selector.val("");
+            });
+        });

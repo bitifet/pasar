@@ -1,6 +1,10 @@
 CHANGELOG.txt
 =============
 
+"version": "1.0.3" - csv and xlsx export filters and minor changes.
+    Implemented csv and xlsx output filters.
+    Minor templating and styling changes and fixes.
+
 "version": "1.0.2" - More intelligent form templating.
     Let to specify from.all simply as form (shorthand).
     Allow form Jade templates to be specified as array of strings (readability).

@@ -36,8 +36,7 @@ block contents
         div
             each f, name in methods
                 div.form(data-id=name, data-path=path data-method=name)
-                    div.fields
-                        !{f.tpl}
+                    div.fields !{f.tpl} 
                     div.controls
                         if f.error
                             p.error= f.error

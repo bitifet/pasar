@@ -1,6 +1,6 @@
 {
   "name": "pasar",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Promise Aware Smart API REST builder to easily implement Express routers with advanced capabilities.",
   "main": "index.js",
   "scripts": {
@@ -31,6 +31,7 @@
     "express": "~4.12.4",
     "jade": "^1.11.0",
     "json2html": "0.0.8",
+    "json2xls-xml": "0.0.12",
     "promise": "^7.0.3"
   }
 }

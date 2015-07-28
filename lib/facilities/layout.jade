@@ -4,6 +4,18 @@ html
     block head
         title= title
         style.
+            *[title]{
+                cursor: help;
+            }
+            input, textarea{
+                cursor: text;
+            }
+            select, a {
+                cursor: pointer;
+            }
+            .loading {
+                cursor: wait;
+            }
             /* NAV MENÚ: {{{ */
             nav.menu {
                 top: 0px;
@@ -40,6 +52,7 @@ html
                 border-left: #000055 solid 4px;
                 border-right-width: 3px;
                 border-bottom: #000055 solid 1px;
+                cursor: pointer;
             }
             .tabs>ul li:hover {
                 border-left: #000055 solid 1px;
