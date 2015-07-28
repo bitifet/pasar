@@ -1,6 +1,8 @@
 CHANGELOG.txt
 =============
 
+"version": "1.1.1" - Fixed bug getting base url for /help facility.
+
 "version": "1.1.0" - CSV and XLSX output filters.
     Fixed default csv output filter separator character (should be comma instead of semicolon).
     Made csv separator and quoting chraracter configurable thought options.
