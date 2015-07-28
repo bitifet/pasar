@@ -1,7 +1,13 @@
 CHANGELOG.txt
 =============
 
-"version": "1.0.3" - csv and xlsx export filters and minor changes.
+"version": "1.1.0" - CSV and XLSX output filters.
+    Fixed default csv output filter separator character (should be comma instead of semicolon).
+    Made csv separator and quoting chraracter configurable thought options.
+    Improved non string, number or date output for csv and xls output filters (outputs JSON).
+    Updated documentation.
+
+"version": "1.0.3" - Basic csv and xlsx export filters and minor changes.
     Implemented csv and xlsx output filters.
     Minor templating and styling changes and fixes.
 

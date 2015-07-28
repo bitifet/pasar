@@ -38,6 +38,8 @@ those concepts are also used here.
     - [Miscellaneous Options](#optMisc)
   * [Advanced Features](#advFeatures)
     - [Authentication handling](#advAuthHandling)
+    - [Overridable output filters](#advFilters)
+        - New Output Filter implementation](#advFiltersDevel)
     - [Local Library function access (Promises): fn](#advFn)
     - [Synchronous local library function access: syncFn](#advSyncFn)
 
@@ -335,10 +337,52 @@ Each filter definition can be:
   * Array [fltName, options] or [function, options] combining those wiht options.
 
 
+#### <a name="advFiltersAvailable"></a>Available Output Filters:
 
-#### <a name=""></a>New Output Filter implementation:
+Currently available (core) output filters are this:
 
-To implement new output filters you should use below template:
+
+#####json:
+
+This is the default output filter. It just shows data (stripping metadata).
+
+
+#####raw:
+
+Shows ALL service function output with *data* (actual data) and *meta* (some optional metadata) properties.
+
+
+#####html:
+
+Html output.
+
+
+#####csv:
+
+Colon separated text output.
+
+**NOTE:** Currently expects simple array input. But works with regular objects and non-string values will be converted to JSON string. Future versions will come with options to optionally auto-expand sub-elements as "FieldName_n" columns, manage sheets, and more...
+
+Valid options:
+
+  * **separator:** Separator character. Default: comma («,»).
+  * **quoting:** Quoting character. Default: double quote («"»).
+
+
+#####xlsx:
+
+Xlsx output.
+
+Like csv expects simple array input by default, if input is a non-array Object, it is threated as a collection of named sheets.
+
+Then, if non array object is gotten, it is gracefully converted to array, storing key in a unnamend column.
+
+String, number or date cell values are propperly handled. Rest of Objects are automatically replaced to it's JSON string.
+
+
+#### <a name="advFiltersDevel"></a>New Output Filter implementation:
+
+To implement new output filters or override existing ones you should use below template:
 
 
 ```javascript

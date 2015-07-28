@@ -123,7 +123,9 @@ Output Filters
   * Multiple output formats selected by extension (default is .json). Including html (to easy data inspection).
     - .json
     - .html
-    - (.csv and more comming soon...)
+    - .csv
+    - .xlsx
+    - and more comming soon...
 
   * Easy access to self explanation (adding '/help' to each url) and fully automated help index.
     - As simple as supplying single help string.
