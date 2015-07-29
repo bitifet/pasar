@@ -375,7 +375,6 @@ PASAR.prototype.buildRootFacility = function buildRootFacility (//{{{
         , facility.tpl.index   // Directly injected Output formatter.
         , Util.dumbFn
         , function(req, method) {
-            console.log(req);
             var model = {
                 path: req.baseUrl,
                 name: facName,
