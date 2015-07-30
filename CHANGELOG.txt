@@ -1,6 +1,7 @@
 CHANGELOG.txt
 =============
 
+"version": "1.1.5" - Better form fields enhancements.
     Automatically added disabling (to not send) checkbox for all inputs in form facilty.
     Better error response displaying in form facilty.
     Show actual key in combo boxes options label in form facility.
