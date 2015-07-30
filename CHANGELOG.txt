@@ -1,6 +1,9 @@
 CHANGELOG.txt
 =============
 
+    Automatically added disabling (to not send) checkbox for all inputs in form facilty.
+    Better error response displaying in form facilty.
+
 "version": "1.1.4" - BUGFIX: Fixed lack of dependency require in default response mapper introduced in modularization process.
 
 "version": "1.1.3" - BUGFIX: Default form template didn't trigger when no specific one specified.
