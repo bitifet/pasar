@@ -1,6 +1,8 @@
 CHANGELOG.txt
 =============
 
+    Added informational placeholder (format) and title (rfc) for "epochdate" fake field type in /form facility.
+
 "version": "1.1.5" - Better form fields enhancements.
     Automatically added disabling (to not send) checkbox for all inputs in form facilty.
     Better error response displaying in form facilty.
