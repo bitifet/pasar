@@ -146,6 +146,8 @@ Output Filters
   * Internally reusable: Services implementation can easily make use of other functions.
     - Method handlers receive JSON object with request parameters NOT request, nor response or next express objects.
     - Also, they are expected to return promises, not actual data or, even less, to deal with http handshaking.
+    - From v1.1.7, they also can be directly called as ``this.srvName.method()`` from other service methods.
+      - NOTE:remember to use ``var me=this`` trick when needed.
 
   * Externally reusable: All service actions are externally exposed thought 'fn' property of the resulting router.
     - I.E.: myRouter.fn.someFunction.get({...}); // will call that method handler directly.

@@ -27,6 +27,7 @@ function PASAR(api, Options) { //{{{
     var me = this;
     me.R = Express.Router();                // Create new router.
     me.Prefs = this.buildPrefs(Options);    // Initialyze preferences.
+    me.services = {};                       // Services object.
     me.facilities = {};                     // Facility models.
     me.R.Promise = me.Prefs.promiseEngine   // Pick for Promise engine.//{{{
         ? me.Prefs.promiseEngine
@@ -109,19 +110,26 @@ function PASAR(api, Options) { //{{{
                 [Auth.defaultHandler] // Default.
             ], Util.duckFn);//}}}
 
+            var serviceHandler = me.indexRtHandler(
+                srvName
+                , method
+                , rtHandler
+            );
+
             if (! me.Prefs.noLib) me.exposeCallable (//{{{
                 fName
-                , rtHandler
+                , serviceHandler
                 , method
                 , outputFilters
             );//}}}
+
 
             // Append main route://{{{
             me.buildHandler(
                 spc.path
                 , method
                 , me.defaultFilter
-                , rtHandler
+                , serviceHandler
                 , requestMapper
                 , responseMapper
                 , authHandler
@@ -135,7 +143,7 @@ function PASAR(api, Options) { //{{{
                     spc.path
                     , method
                     , [outputFilters[ext], ext]
-                    , rtHandler
+                    , serviceHandler
                     , requestMapper
                     , responseMapper
                     , authHandler
@@ -235,15 +243,32 @@ function PASAR(api, Options) { //{{{
 
 };//}}}
 
+
+PASAR.prototype.indexRtHandler = function indexRtHandler(
+    srvName         // Service Name.
+    , method        // Method
+    , rtHandler     // Actual handler.
+) {
+    var me = this;
+
+    if (me.services[srvName] === undefined) me.services[srvName] = {};
+    me.services[srvName][method] = function() {
+        return rtHandler.apply(me.services, arguments);
+    };
+
+    return me.services[srvName][method];
+};
+
+
 PASAR.prototype.buildHandler = function buildHandler(//{{{
-        pathSpec       // Base route path.
-        , service        // Method name (or "all") or facility name (Ex.: "/help");
-        , flt            // [outputFilter, fileExtension]
-        , ctrl           // Our actual functionality implementation returning promise.
-        , requestMapper  // Request handler to obtain input object.
-        , responseMapper // Response handler to serve returning data.
-        , authHandler    // Authentication handler.
-        , ac             // Access Control data (from specification).
+    pathSpec         // Base route path.
+    , service        // Method name (or "all") or facility name (Ex.: "/help");
+    , flt            // [outputFilter, fileExtension]
+    , srvHandler     // Our actual functionality implementation returning promise.
+    , requestMapper  // Request handler to obtain input object.
+    , responseMapper // Response handler to serve returning data.
+    , authHandler    // Authentication handler.
+    , ac             // Access Control data (from specification).
 ) {
     var me = this;
 
@@ -275,6 +300,21 @@ PASAR.prototype.buildHandler = function buildHandler(//{{{
     //  ...but, defining a requestHandler property over them, you could easily change that.
     //}}}
 
+    var ctrl = (typeof srvHandler == "function")
+        ? function(input, auth) {
+            return me.R.Promise.resolve(srvHandler(
+                input
+                , auth
+            ));
+        }
+        : function(){
+            return srvHandler;
+        }
+    ;
+    if (typeof requestMapper != "function") requestMapper = function(){
+        return requestMapper;
+    };
+
     me.R[method](routePath, function (req,res,next) {
 
         var auth = Auth.trust(
@@ -290,13 +330,10 @@ PASAR.prototype.buildHandler = function buildHandler(//{{{
 
         if (! auth) return;
 
-        var input = (typeof ctrl == "function")
-            ? me.R.Promise.resolve(ctrl(
-                requestMapper(req, method) // Our function input data.
-                , auth
-            ))
-            : ctrl
-        ;
+        var input = ctrl(
+            requestMapper(req, method) // Our function input data.
+            , auth
+        );
 
         responseMapper(
             input 

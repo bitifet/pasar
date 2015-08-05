@@ -1,6 +1,10 @@
 CHANGELOG.txt
 =============
 
+
+"version": "1.1.7" - Easier way to internally reuse other API services.
+    Make service methods callable inside others thought this.srvName.method().
+
 "version": "1.1.6" - Improvements for /form facility and html output filter.
     Added informational placeholder (format) and title (rfc) for "epochdate" fake field type in /form facility.
     Html output filter now accepts Jade templates (thought tpl and/or layout Options).
