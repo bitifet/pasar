@@ -403,6 +403,13 @@ To implement new output filters or override existing ones you should use below t
                 ctype: "text/html", // Content type for your output.
                 data: output
             };
+            // NOTE: Alternatively, you can return a promise of that object.
+            //   This way, your filter implementation can work asynchronously if needed.
+            //   When promise is fullfilled or rejected, apropriate response is sent to client.
+            // NOTE 2: This works because default response mapper makes a Promise.resolve() over
+            //   filter response. When using your own response handler
+            //   implementation, you shoud take care of that if you want to return
+            //   promises from your output filters.
         }
 
         // NOTE: runtimeOptions are undefined by default because output
