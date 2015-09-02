@@ -172,6 +172,8 @@ This is performed following below rules:
 
     - data-value: Just like data-key, but for description (instead of picking first property as default). Multiple fields can be specified separated by "+" (will be hyphen joined).
 
+    - data-fkeys: Allow to specify filters (foreign keys) based on other combo-boxes selected option. Syntax: foreignFieldName=colunName[,...]. 
+
 
 **Example (Jade):**
 

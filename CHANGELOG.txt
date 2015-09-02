@@ -1,8 +1,10 @@
 CHANGELOG.txt
 =============
 
+"version": "1.1.8",
     Output filters now can return promises, so their work can be achieved asynchronously.
     Multi-field labels for select options in form facility combo boxes (thought "+" separator in data-value property).
+    (Multiple) Foreign keys filters between combo boxes in form facility now can be specified thought data-fkeys property.
 
 "version": "1.1.7" - Easier way to internally reuse other API services.
     Make service methods callable inside others thought this.srvName.method().
