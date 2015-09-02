@@ -2,6 +2,7 @@ CHANGELOG.txt
 =============
 
     Output filters now can return promises, so their work can be achieved asynchronously.
+    Multi-field labels for select options in form facility combo boxes (thought "+" separator in data-value property).
 
 "version": "1.1.7" - Easier way to internally reuse other API services.
     Make service methods callable inside others thought this.srvName.method().

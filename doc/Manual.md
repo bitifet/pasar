@@ -170,7 +170,7 @@ This is performed following below rules:
 
     - data-key: Key (of the value object properties) to be used for the option tag id (instad of actual array/object key).
 
-    - data-value: Just like data-key, but for description (instead of picking first property as default).
+    - data-value: Just like data-key, but for description (instead of picking first property as default). Multiple fields can be specified separated by "+" (will be hyphen joined).
 
 
 **Example (Jade):**
