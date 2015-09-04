@@ -143,6 +143,8 @@ Output Filters
       - /help: Help index.
       - /test: Run all tests (not yet implemented).
 
+  * Global, per-api and per-function configurable timeouts (via promise rejection).
+
   * Internally reusable: Services implementation can easily make use of other functions.
     - Method handlers receive JSON object with request parameters NOT request, nor response or next express objects.
     - Also, they are expected to return promises, not actual data or, even less, to deal with http handshaking.
@@ -375,8 +377,6 @@ Then, to mount your API REST to your Express router simply:
   * Posibility to execute predefined tests clientside thought /test facilities.
 
   * Configurable logging capabilites (including time measurement).
-
-  * Global, per-api and per-function configurable timeouts (via promise rejection).
 
   * Promise-level caching.
 

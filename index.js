@@ -132,6 +132,7 @@ function PASAR(api, Options) { //{{{
                 srvName
                 , method
                 , rtHandler
+                , timeOut
             );
 
             if (! me.Prefs.noLib) me.exposeCallable (//{{{
@@ -152,7 +153,6 @@ function PASAR(api, Options) { //{{{
                 , responseMapper
                 , authHandler
                 , spc.ac
-                , timeOut
             );
             //}}}
 
@@ -167,7 +167,6 @@ function PASAR(api, Options) { //{{{
                     , responseMapper
                     , authHandler
                     , spc.ac
-                    , timeOut
                 );
             };//}}}
 
@@ -268,12 +267,23 @@ PASAR.prototype.indexRtHandler = function indexRtHandler(
     srvName         // Service Name.
     , method        // Method
     , rtHandler     // Actual handler.
+    , timeOut        // Maximum permitted execution time.
 ) {
     var me = this;
 
     if (me.services[srvName] === undefined) me.services[srvName] = {};
     me.services[srvName][method] = function() {
-        return rtHandler.apply(me.services, arguments);
+        var p = rtHandler.apply(me.services, arguments);
+        return timeOut 
+            ? new me.R.Promise(function(resolve, reject){
+                p.then(function(data){resolve(data);});
+                setTimeout(
+                    function(){reject(timeOut[1]);} // Message.
+                    , timeOut[0] // Delay.
+                );
+            })
+            : p
+        ;
     };
 
     return me.services[srvName][method];
@@ -289,7 +299,6 @@ PASAR.prototype.buildHandler = function buildHandler(//{{{
     , responseMapper // Response handler to serve returning data.
     , authHandler    // Authentication handler.
     , ac             // Access Control data (from specification).
-    , timeOut        // Maximum permitted execution time.
 ) {
 
     var me = this;
@@ -348,20 +357,10 @@ PASAR.prototype.buildHandler = function buildHandler(//{{{
     // ----------------------
     var ctrl = (typeof srvHandler == "function")
         ? function(input, auth) {
-            var p = me.R.Promise.resolve(srvHandler(
+            return me.R.Promise.resolve(srvHandler(
                 input
                 , auth
             ));
-            return timeOut 
-                ? new me.R.Promise(function(resolve, reject){
-                    p.then(function(data){resolve(data);});
-                    setTimeout(
-                        function(){reject(timeOut[1]);} // Message.
-                        , timeOut[0] // Delay.
-                    );
-                })
-                : p
-            ;
         }
         : function(){
             return srvHandler;
