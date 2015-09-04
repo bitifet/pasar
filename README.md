@@ -143,7 +143,7 @@ Output Filters
       - /help: Help index.
       - /test: Run all tests (not yet implemented).
 
-  * Global, per-api and per-function configurable timeouts (via promise rejection).
+  * Global, per-api, per-service and per-method configurable timeouts (via promise rejection).
 
   * Internally reusable: Services implementation can easily make use of other functions.
     - Method handlers receive JSON object with request parameters NOT request, nor response or next express objects.
@@ -266,6 +266,15 @@ All API definitions should look's like follows:
             _post: function(input) {
                 // ...
             },
+            timeout: 3000, // Reject with timeout error if promise is not resolved after 3 seconds.
+                // Or: timeout: {all: 3000},
+                //
+                // NOTE: You can set different timeouts for specific methods (i.e.: "{get:5000, post:3000}")
+                //     ...but this only works if defined separately. Methods defined in block thought _all
+                //     property will only get generic timeout (because it also becomes single express route).
+                //
+                // NOTE 2: You can customize timeout error message passing an array like this:
+                //     timeout: [3000, "Operation taken too long"],
             help: {
                 contents: "Explain what this function does...",
                 brief: "Brief explanation to be shown in whole API help index",

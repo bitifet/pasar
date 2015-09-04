@@ -27,6 +27,7 @@ those concepts are also used here.
     - [help](#spcHelp)
     - [form](#spcForm)
     - [meta](#spcMeta)
+    - [timeout](#spcTimeout)
     - [authHandler](#spcAuthHandler)
     - [ac](#spcAc)
     - [requestMapper](#spcRequestMapper)
@@ -186,6 +187,24 @@ This is performed following below rules:
 ### <a name="spcMeta"></a>meta
 
 FIXME
+
+
+### <a name="spcTimeout"></a>timeout
+
+Let to specify a timeout after that promise is automatically rejected.
+
+Syntax:
+
+    timeout: milliseconds
+    timeout: [milliseconds, message]    // To specify custom error message.
+    timeout: {
+        get: milliseconds,              // Will apply only to GET requests
+                                        // (except if defined thought _all*)
+        post: [milliseconds, message],
+        all: milliseconds,              // (or [ms, msg]) to set default for
+                                        // the remaining.
+
+(*) Method implementations defined though _all will NOT take specific get, post, etc... timeout specifications EVEN when requested with that methdo because "_all" vector generates only single Express route (with express router.all() function).
 
 
 

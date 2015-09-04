@@ -112,7 +112,11 @@ function PASAR(api, Options) { //{{{
 
             // Sanityze timeout parameter://{{{
             // ---------------------------
-            var timeOut = spc.timeout;
+            var timeOut = Util.pick([
+                [spc.timeout, method],
+                [spc.timeout, "all"],
+                [spc.timeout]
+            ]);
             if (timeOut !== undefined) {
                 var timeOutMessage = me.Prefs.defaultTimeoutMessage; // Default msg.
                 if (timeOut instanceof Array) { // Accept [timeut, msg] syntax.//{{{
