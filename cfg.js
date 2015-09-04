@@ -11,6 +11,7 @@
 "use strict";
 module.exports = {
     defaultOutputFilter: "json",
+    defaultTimeoutMessage: "Timeout!",
     tplBriefLenght: 400,
     validMethods: ['get', 'post', 'put', 'delete', 'all'],
     statIdx: {

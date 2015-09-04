@@ -110,6 +110,24 @@ function PASAR(api, Options) { //{{{
                 [Auth.defaultHandler] // Default.
             ], Util.duckFn);//}}}
 
+            // Sanityze timeout parameter://{{{
+            // ---------------------------
+            var timeOut = spc.timeout;
+            if (timeOut !== undefined) {
+                var timeOutMessage = me.Prefs.defaultTimeoutMessage; // Default msg.
+                if (timeOut instanceof Array) { // Accept [timeut, msg] syntax.//{{{
+                    if (typeof timeOut[1] == "string" && timeOut[1].length) timeOutMessage = timeOut[1];
+                    timeOut=timeOut[0];
+                };//}}}
+                timeOut=Math.abs(+timeOut);
+                timeOut = (timeOut && !isNaN(timeOut))
+                    ? [timeOut, timeOutMessage]
+                    : undefined; // Disable on falsy or NaN.
+                ;
+            };
+            // ---------------------------//}}}
+
+
             var serviceHandler = me.indexRtHandler(
                 srvName
                 , method
@@ -134,6 +152,7 @@ function PASAR(api, Options) { //{{{
                 , responseMapper
                 , authHandler
                 , spc.ac
+                , timeOut
             );
             //}}}
 
@@ -148,6 +167,7 @@ function PASAR(api, Options) { //{{{
                     , responseMapper
                     , authHandler
                     , spc.ac
+                    , timeOut
                 );
             };//}}}
 
@@ -269,52 +289,88 @@ PASAR.prototype.buildHandler = function buildHandler(//{{{
     , responseMapper // Response handler to serve returning data.
     , authHandler    // Authentication handler.
     , ac             // Access Control data (from specification).
+    , timeOut        // Maximum permitted execution time.
 ) {
+
     var me = this;
 
-    if (! (flt instanceof Array)) flt = [flt];
-    var ext = flt[1];
-    var outputFilter = flt[0];
+    // Pick extension and outputFilter://{{{
+    // --------------------------------
 
-    var method = (service[0] == "/")
-        ? "get"     // Facilitiy. Always called thought GET method.
-        : service   // Actual service method handler.
-    ;
+    // Extract extension specification when provided:
+    if (! (flt instanceof Array)) flt = [flt]; // Accept simpler syntax (without extension).
+    var ext = flt[1]; // Extension (if any).
+    var outputFilter = flt[0];      // Output Filter.
 
-    var routePath = ext
-        ? pathSpec + "." + ext
-        : pathSpec
-    ;
+    // Default Output Filter.
+    if (! outputFilter) outputFilter = Util.dumbFn;
 
-    if (! ac) ac = {};
-
-    // Output Filter and Output Filter runtime options://{{{
-    if (! outputFilter) outputFilter = Util.dumbFn; // Default Output Filter.
-
-    // Request handler to retrive runtime options for output filter.
+    // Optional request handler to retrieve runtime options for output filter.
     var ofReqHandler = (typeof outputFilter.requestHandler == "function")
         ? outputFilter.requestHandler
         : function (req) {return {};} // (Default)
     ;
     // NOTE: Output filters are usually expected to NOT depend on request input.
     //  ...but, defining a requestHandler property over them, you could easily change that.
-    //}}}
 
+    // --------------------------------//}}}
+
+    // Determine actual method://{{{
+    // ------------------------
+    var method = (service[0] == "/")
+        ? "get"     // Facilitiy. Always called thought GET method.
+        : service   // Actual service method handler.
+    ;
+    // ------------------------//}}}
+
+    // Autocomplete routePath://{{{
+    // -----------------------
+    var routePath = ext
+        ? pathSpec + "." + ext
+        : pathSpec
+    ;
+    // -----------------------//}}}
+
+    // Sanityze ac://{{{
+    // ------------
+    if (! ac) ac = {};
+    // ------------//}}}
+
+    // Sanityze requestMapper://{{{
+    // -----------------------
+    if (typeof requestMapper != "function") requestMapper = function(){
+        return requestMapper;
+    };
+    // -----------------------//}}}
+
+
+    // Build core controller://{{{
+    // ----------------------
     var ctrl = (typeof srvHandler == "function")
         ? function(input, auth) {
-            return me.R.Promise.resolve(srvHandler(
+            var p = me.R.Promise.resolve(srvHandler(
                 input
                 , auth
             ));
+            return timeOut 
+                ? new me.R.Promise(function(resolve, reject){
+                    p.then(function(data){resolve(data);});
+                    setTimeout(
+                        function(){reject(timeOut[1]);} // Message.
+                        , timeOut[0] // Delay.
+                    );
+                })
+                : p
+            ;
         }
         : function(){
             return srvHandler;
         }
     ;
-    if (typeof requestMapper != "function") requestMapper = function(){
-        return requestMapper;
-    };
+    // ----------------------//}}}
 
+    // Build and route service://{{{
+    // ------------------------
     me.R[method](routePath, function (req,res,next) {
 
         var auth = Auth.trust(
@@ -348,6 +404,7 @@ PASAR.prototype.buildHandler = function buildHandler(//{{{
         );
 
     });
+    // ------------------------//}}}
 
 };//}}}
 
@@ -450,6 +507,8 @@ PASAR.prototype.buildPrefs = function applyDefaultPreferences(Options) {//{{{
     // Define some extra default values:
     Util.propSet(prefs, "client.jQuery", Cfg.paths.jQuery);
 
+    // Define default timeout message:
+    Util.propSet(prefs, "defaultTimeoutMessage", Cfg.defaultTimeoutMessage);
 
     return prefs;
 
