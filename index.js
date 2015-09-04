@@ -22,11 +22,12 @@ var Facilities = {
     form: require("./lib/facilities/form"),
 };
 
-function PASAR(api, Options) { //{{{
+function PASAR(api, Options, cri) { //{{{
 
     var me = this;
     me.R = Express.Router();                // Create new router.
     me.Prefs = this.buildPrefs(Options);    // Initialyze preferences.
+    me.cri = cri; cri || (me.cri = {});     // Common Resources Interface.
     me.services = {};                       // Services object.
     me.facilities = {};                     // Facility models.
     me.R.Promise = me.Prefs.promiseEngine   // Pick for Promise engine.//{{{
@@ -277,14 +278,27 @@ PASAR.prototype.indexRtHandler = function indexRtHandler(
 
     if (me.services[srvName] === undefined) me.services[srvName] = {};
     me.services[srvName][method] = function() {
+        var pbk = {}; // "Promise-callbacks" placeholder.
+        /*#/ arguments[0] = (- Actual input -)
+        /*#/ arguments[1] = (- Authentication handler -)
+        /**/ arguments[2] = me.cri; // (Common Resources Interface)
+        /**/ arguments[3] = pbk;
+
         var p = rtHandler.apply(me.services, arguments);
         return timeOut 
             ? new me.R.Promise(function(resolve, reject){
-                p.then(function(data){resolve(data);});
-                setTimeout(
-                    function(){reject(timeOut[1]);} // Message.
+                var t = setTimeout(
+                    function(){
+                        reject(timeOut[1]); // Message.
+                        // Call cleanup function if provided:
+                        if (typeof pbk.cleanup == "function") pbk.cleanup();
+                    }
                     , timeOut[0] // Delay.
                 );
+                p.then(function(data){
+                    clearTimeout(t);
+                    resolve(data);
+                });
             })
             : p
         ;
@@ -364,6 +378,8 @@ PASAR.prototype.buildHandler = function buildHandler(//{{{
             return me.R.Promise.resolve(srvHandler(
                 input
                 , auth
+                , null // RESERVED (injected in indexRtHandler())
+                , null // RESERVED (injected in indexRtHandler())
             ));
         }
         : function(){
@@ -565,8 +581,8 @@ PASAR.prototype.exposeCallable = (function(){//{{{
 })();//}}}
 
 
-function apiBuilder (apiSpec, Options) {//{{{
-    return new PASAR(apiSpec, Options);
+function apiBuilder (apiSpec, Options, cri) {//{{{
+    return new PASAR(apiSpec, Options, cri);
 };
 apiBuilder.prototype = PASAR;//}}}
 
