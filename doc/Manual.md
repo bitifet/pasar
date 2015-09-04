@@ -38,6 +38,7 @@ those concepts are also used here.
     - ["client" Option](#optClient)
     - [Miscellaneous Options](#optMisc)
   * [Advanced Features](#advFeatures)
+    - [Common Resources Interface (CRI)](#advCRI)
     - [Authentication handling](#advAuthHandling)
     - [Overridable output filters](#advFilters)
         - New Output Filter implementation](#advFiltersDevel)
@@ -69,7 +70,7 @@ To install pasar in your project you just need to type:
 To build your own API REST with PASAR, you just need to do:
 
     var Pasar = require("pasar");
-    var myApi = Pasar(apiSpec, Options); // Returns Express Router.
+    var myApi = Pasar(apiSpec, Options, CRI); // Returns Express Router.
 
 ...where:
 
@@ -78,6 +79,9 @@ apiSpec
 
 Options
 : (Optional) Object with some options which lets you to fine-tune your desired API capabilities. See [Api Options](#apiOptions).
+
+CRI
+: (Optional) Initialization of Common Resources Interface (See [CRI](#advCRI)).
 
 
 <a name="mounting"></a>Mounting API:
@@ -129,6 +133,47 @@ Each service specification consists of one or more of the below properties:
 ### <a name="spcMethods"></a>[\_get, \_post, \_put, \_delete, \_all] method implementations.
 
 FIXME
+
+
+Example:
+
+    get: function(
+        input   // Actual input data.
+        , ac    // Access-Control handler*.
+        , cri   // Common Resources Inteface.
+        , pbk   // "Promise-bak" (placeholder for clenup.
+    ) {
+        // Implement cleanup if needed:
+        pbk.cleanup = function() {
+            // Do some cleanup.
+        }
+
+        // Return promise:
+        return new Promise(function(resolve, reject){
+
+            // NOTE: pbk.cleanup perfectly can be defined here if you prefer...
+
+            // Do some async stuff and...
+
+            if (all_ok) {
+                resolve(some_data);
+            } else {
+                reject(reason);
+            };
+
+            // NOTE: Defining pbk.cleanup here instead, could cause unexpected
+            // behaviour...
+
+            // Manually call your cleanup function if needed even operation
+            // is'nt cancelled by external timeout:
+            pbk.cleanup();
+
+        });
+
+    },
+
+
+
 
 
 ### <a name="spcPath"></a>path
@@ -205,6 +250,36 @@ Syntax:
                                         // the remaining.
 
 (*) Method implementations defined though _all will NOT take specific get, post, etc... timeout specifications EVEN when requested with that methdo because "_all" vector generates only single Express route (with express router.all() function).
+
+
+#### <a name="spcTimeoutCleanup"></a>Cleanup callback
+
+When timeout fires, the promise responsive to provide the data for the response
+is rejected and, hence, timeout error is send back to clien.
+    
+But it is possible that there is some process or resources, such as database
+connections, file buffers, etc... which remains already executing pointless. 
+
+
+As is explained in [method implementations](#spcMethods), all method
+implementation functions recevies a "pbk" called parameter (standing for
+"Promise-callback") which is a placeholder to return back things to
+PASAR when needed.
+
+Currently the only expected (and optional) parameter to be defined from inside
+method implementation is so called 'cleanup' which, if defined, is expected to
+be a function that will be called in case of timeout is triggered. So you can
+implement your cleanup stuff there.
+
+IMPORTANT: This clenup function will be called ONLY in case of timeout. In
+normal fullfillment or rejection of your returning promise, you are responsible
+to call it (or not) when needed.
+
+
+WARNING: You should be carefull to define it BEFORE any chance returning
+promise could be resolved neither with fullfillment or rejetion (including
+timeout). That is: NOT in any async operation. Check [method
+implementations](#spcMethods) section for a clear example.
 
 
 
@@ -322,6 +397,28 @@ defaultFilter
 
 
 FIXME
+
+
+### <a name="advCRI"></a>Common Resources Interface
+
+
+CRI (standing for "Common Resources Interface") is simply a shared
+object that is passed to all method implementations as third parameter.
+
+It allows all API method implementations to share data, functions or any
+kind of resources even when spreaded across multiple files withot
+needing to separately require them as modules in each file.
+
+It can be initialyzed by passing it as third parameter to PASAR
+constructor. But, if omitted, it automatically defaults to empty object.
+So you doesn't need to define it explicitly at all. It will even be
+available for data sharing to all method implementations which declare
+it as (third) parameter.
+
+I called it "cri" to avoid calling it "res", standing for "resources" to
+avoid confusion with the Express response object (even we thankfully
+sould almost never need to deal with it).
+
 
 
 ### <a name="advAuthHandling"></a>Authentication handling

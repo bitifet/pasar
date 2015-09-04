@@ -1,7 +1,11 @@
 CHANGELOG.txt
 =============
 
+"version": "1.2.0" - Timeout, Cleanup, and CRI.
     Timeout parameter implementation and documentation.
+    Implemented Common Resources Interface (CRI).
+    Implemented the ability to provide a clenaup callback for timeouts.
+    Documented clenup (pbk) callback and CRI.
 
 "version": "1.1.8"
     Output filters now can return promises, so their work can be achieved asynchronously.
