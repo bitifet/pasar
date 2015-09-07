@@ -491,7 +491,6 @@ PASAR.prototype.buildRootFacility = function buildRootFacility (//{{{
             var model = {
                 path: req.baseUrl,
                 name: facName,
-                prefs: me.Prefs.client,
                 fn: Object.keys(spc).map(function(srvName){return me.facilities[facName][srvName];}),
             };
             model.title = facility.buildTitle(model);
@@ -522,9 +521,6 @@ PASAR.prototype.buildPrefs = function applyDefaultPreferences(Options) {//{{{
 
     // Select default output filter:
     Util.propSet(prefs, "defaultFilter", Cfg.defaultOutputFilter);
-
-    // Define some extra default values:
-    Util.propSet(prefs, "client.jQuery", Cfg.paths.jQuery);
 
     // Define default timeout message:
     Util.propSet(prefs, "defaultTimeoutMessage", Cfg.defaultTimeoutMessage);
