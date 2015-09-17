@@ -1,6 +1,8 @@
 CHANGELOG.txt
 =============
 
+    Usability enhancements (templating / css) in form facility.
+
 "version": "1.2.1" - BUGFIX: Fixed cross-site restriction issue with chromium and others.
     Included and inlined jQuery source in facilities layout to avoid many browsers security restrictions.
 

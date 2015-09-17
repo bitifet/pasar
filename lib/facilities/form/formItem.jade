@@ -6,8 +6,21 @@ append head
             width: 100%;
             min-height: 15em;
         }
+        div.form {
+            margin-bottom: 4em;
+            z-index: 0;
+        }
         div.form div.controls {
+            position: fixed;
+            bottom:70%;
+            left: 0px;
+            right: 0px;
+            height: 2em;
             text-align:right;
+            padding-right: 2em;
+            background: #ccccdd;
+            boder-top: #bbbbcc;
+            z-index: 1;
         }
         div.form div.controls p {
             display: inline;
@@ -21,38 +34,60 @@ append head
         header button#clearResults {
             float: right;
             display: none;
-        };
+        }
+        div.formWindow {
+            position: fixed;
+            top: 0px;
+            left: 0px;
+            right: 0px;
+            height: 30%;
+            overflow: auto;
+        }
+        div.formWindow div.tabs>div {
+            background: #eeeeee;
+            margin-bottom: 4em;
+        }
+        div.resultsWindow {
+            position: fixed;
+            bottom: 0px;
+            left: 0px;
+            right: 0px;
+            height: 70%;
+            overflow: auto;
+            background: #eeeeee;
+        }
     //- }}}
 
 block contents
-    nav.menu
-        a(href="../"+name) Index
-    h1.
-        #{meta.title} Form (#{path})
-    div.tabs
-        ul
-            each f, name in methods
-                li(data-id=name)= name.toUpperCase()
-        div
-            each f, name in methods
-                div.form(data-id=name, data-path=path data-method=name)
-                    div.fields !{f.tpl} 
-                    div.controls
-                        if f.error
-                            p.error= f.error
-                        if f.isDefault
-                            - var hint="This is the default form template.  Use JSON data to provide your request parameters or configure specific form template in API definition.";
-                            p.info(title=hint)
-                                | (Default Form)
-                        p
-                            button.reset Reset
-                        p
-                            button.submit Submit
-        div
-            header
-                h2 Results
-                button#clearResults Clear
-            div#results
+    div.formWindow
+        nav.menu
+            a(href="../"+name) Index
+        h1.
+            #{meta.title} Form (#{path})
+        div.tabs
+            ul
+                each f, name in methods
+                    li(data-id=name)= name.toUpperCase()
+            div
+                each f, name in methods
+                    div.form(data-id=name, data-path=path data-method=name)
+                        div.fields !{f.tpl} 
+                        div.controls
+                            if f.error
+                                p.error= f.error
+                            if f.isDefault
+                                - var hint="This is the default form template.  Use JSON data to provide your request parameters or configure specific form template in API definition.";
+                                p.info(title=hint)
+                                    | (Default Form)
+                            p
+                                button.reset Reset
+                            p
+                                button.submit Submit
+    div.resultsWindow
+        header
+            h2 Results
+            button#clearResults Clear
+        div#results
 
     script
         include ./formClient.js
