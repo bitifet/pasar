@@ -47,6 +47,8 @@ function PASAR(api, Options, cri) { //{{{
     
     // Populate all specified services://{{{
     // ================================
+    if (api instanceof Array) api = Util.oExtend(api);
+    // Let to provide multiple parts packed in arrays for better modularization.
     for (var srvName in api) {
         var fName = srvName.replace("/", "_"); // Exposed function name.
         var spc = api[srvName];                // Function full specification.

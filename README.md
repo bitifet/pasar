@@ -76,6 +76,24 @@ Service definitions consists in an object with one or more attributes. Simples't
     },
 ```
 
+If your API grows too much, you can provide an array of smaller service definiton sets instead of single one. Ex.:
+
+```javascript
+
+    var myApi = [
+        requere("path1/sumbmodule1.js", // Services defined in other module.
+        requere("path2/sumbmodule2.js", // More modularyzed services...
+        { // And of course, some others can be defined directly here...
+            myServiceName: {
+                // Service definition.
+            },
+            // ...
+        }
+    ];
+
+```
+
+
 (See more complete [examples]() later...)
 
 
