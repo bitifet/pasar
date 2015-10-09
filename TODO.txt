@@ -1,0 +1,11 @@
+TO-DO list:
+===========
+
+  * Modify request mapper to get url parameters "as is":
+    - i.e.: "/foo/:section/bar/:id" will generate ':section' and ':id' vectors in service handler input.
+
+  * Accept array as path parameter to deploy same service over multiple urls.
+    - Example: ["/foo/bar", "/foo/bar/:id]
+
+  * Move to bluebird as default promise engine.
+
