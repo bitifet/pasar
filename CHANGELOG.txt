@@ -6,6 +6,7 @@ CHANGELOG.txt
     Facilities are now addressed by serviceName uncontionally (ignoring service "path" when explicitly specified).
     Implemented 'allowOverrideAllFacilities' and 'allowOverrideHelp', 'allowOverrideForm', etc... preferences.
     Accept array as path parameter to deploy same service over multiple urls.
+    Implemented "allowXXXFilterOverride" and "allowAllFiltersOverride" preferences for the same purpose.
 
 "version": "1.2.2" - Better usability and simpler modularization.
     Usability enhancements (templating / css) in form facility.

@@ -16,7 +16,7 @@ TO-DO list:
   (DONE) Change all "noOverrideXXX" with equivalent "allowOverrideXXX", reversing logic and defaulting to true.
     - This will be more consistent with future "allow(Filters)Override..." preferences.
 
-  * Implemented simetric "allowXXXFilterOverride" and "allowAllFiltersOverride" preferences for the same purpose.
+  (DONE) Implemented simetric "allowXXXFilterOverride" and "allowAllFiltersOverride" preferences for the same purpose.
     - All defaults to false meaning that available filters are not overridable by routes.
 
   (DONE) Accept array as path parameter to deploy same service over multiple urls.

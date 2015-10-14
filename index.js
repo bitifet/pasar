@@ -211,9 +211,23 @@ function PASAR(api, Options, cri) { //{{{
 
             for (var i in spc.path) {
 
-                // Append routes for all available output filters://{{{
+                var flt = {
+                    pre: [],
+                    post: [],
+                };
+
+                // Prepare routes for all available output filters://{{{
                 if (! me.Prefs.noFilters) for (var ext in outputFilters) {
-                    me.buildHandler(
+
+                    var E = ext[0].toUpperCase() + ext.substring(1);
+
+                    var target = Util.pick([
+                            [me.Prefs["allow"+E+"FilterOverride"]]
+                            , [me.Prefs["allowAllFiltersOverride"]]
+                            , [false]
+                    ]) ? "post" : "pre";
+
+                    flt[target].push([
                         spc.path[i]
                         , method
                         , [outputFilters[ext], ext]
@@ -222,8 +236,12 @@ function PASAR(api, Options, cri) { //{{{
                         , responseMapper
                         , authHandler
                         , spc.ac
-                    );
+                    ]);
                 };//}}}
+
+                flt.pre.map(function(f){
+                    me.buildHandler.apply(me, f);
+                });
 
                 // Append main route://{{{
                 me.buildHandler(
@@ -237,6 +255,10 @@ function PASAR(api, Options, cri) { //{{{
                     , spc.ac
                 );
                 //}}}
+
+                flt.post.map(function(f){
+                    me.buildHandler.apply(me, f);
+                });
 
             };
 
