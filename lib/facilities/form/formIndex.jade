@@ -6,9 +6,9 @@ html
     h1= title
     ul
         each f in fn
-            - var url = f.path.substring(1) + "/" + name;
+            - var url = f.srvName+"/" + name;
             li
                 b
-                    a(href=url)= f.path
+                    a(href=url)= f.srvName
                 span.
                     :&nbsp;#{f.brief}

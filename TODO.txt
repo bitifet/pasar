@@ -4,12 +4,12 @@ TO-DO list:
   (DONE) Modify request mapper to get url parameters "as is":
     - i.e.: "/foo/:section/bar/:id" will generate ':section' and ':id' vectors in service handler input.
 
-  * Fix facilities breaking when using url parameters by using serviceName instead of actual path. So:
+  (ALMOST DONE) Fix facilities breaking when using url parameters by using serviceName instead of actual path. So:
     - «"foo/:bar": {_get:...}» will be broken anyway.
     - «"foo": {path:"foo/:bar",_get:...}»:
       º Service facilities will be attached to foo/facility_name (BUT OVERRIDDEN in this case).
       º Root facility will be attached normally to /facility_name.
-      º foo/facility_name overridding could be avoided thought propper configuration parameter.
+      (PENDING) foo/facility_name overridding could be avoided thought propper configuration parameter.
 
   * Accept array as path parameter to deploy same service over multiple urls.
     - Example: ["/foo/bar", "/foo/bar/:id]

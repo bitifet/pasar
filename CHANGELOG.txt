@@ -3,6 +3,7 @@ CHANGELOG.txt
 
     Improved form facility "reset" button behaviour.
     Updated default Request Mapper to map url parameters (":prmName") "as is" (colon-preffixed).
+    Facilities are now addressed by serviceName uncontionally (ignoring service "path" when explicitly specified).
 
 "version": "1.2.2" - Better usability and simpler modularization.
     Usability enhancements (templating / css) in form facility.

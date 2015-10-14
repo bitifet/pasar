@@ -53,6 +53,7 @@ function PASAR(api, Options, cri) { //{{{
         var fName = srvName.replace("/", "_"); // Exposed function name.
         var spc = api[srvName];                // Function full specification.
         var fltIndex = {};
+        spc.srvName = srvName;
 
         spc.path = (function guessRoutePath(srvName, spc) { // Resolve route path.//{{{
             var rtPath = spc.path; // Let to specify complete route Path without messing service name.
@@ -460,7 +461,7 @@ PASAR.prototype.buildFacility = function buildFacility(//{{{
 
     me.buildHandler(
         // Using buildHandler ensures consistent behaviour.
-        spc.path + "/"+facName
+        "/"+srvName+"/"+facName
         , "/"+facName           // Facility name.
         , facility.tpl.item   // Directly injected Output formatter.
         , me.facilities[facName][srvName]          // Actual input.
