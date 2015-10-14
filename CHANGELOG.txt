@@ -4,7 +4,8 @@ CHANGELOG.txt
     Improved form facility "reset" button behaviour.
     Updated default Request Mapper to map url parameters (":prmName") "as is" (colon-preffixed).
     Facilities are now addressed by serviceName uncontionally (ignoring service "path" when explicitly specified).
-    Implemented 'noOverrideAllFacilities' and 'noOverrideHelp', 'noOverrideForm', etc... preferences.
+    Implemented 'allowOverrideAllFacilities' and 'allowOverrideHelp', 'allowOverrideForm', etc... preferences.
+    Accept array as path parameter to deploy same service over multiple urls.
 
 "version": "1.2.2" - Better usability and simpler modularization.
     Usability enhancements (templating / css) in form facility.

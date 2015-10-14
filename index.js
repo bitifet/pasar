@@ -57,8 +57,9 @@ function PASAR(api, Options, cri) { //{{{
 
         spc.path = (function guessRoutePath(srvName, spc) { // Resolve route path.//{{{
             var rtPath = spc.path; // Let to specify complete route Path without messing service name.
-            if (rtPath === undefined) rtPath = srvName; // Default to service name if not provided.
-            if (rtPath[0] !== "/") rtPath = "/" + rtPath; // Fix starting slash when missing.
+            if (rtPath === undefined) rtPath = [srvName]; // Default to service name if not provided.
+            if (! (rtPath instanceof Array)) rtPath = [rtPath];
+            rtPath = rtPath.map(function(p){return (p[0]=="/"?"":"/")+p;}); // Fix starting slash when missing.
             return rtPath;
         })(srvName, spc);//}}}
 
@@ -92,10 +93,11 @@ function PASAR(api, Options, cri) { //{{{
                 // Handle me.Prefs.noHelp, .noForm, etc...
                 if (me.Prefs["no"+F]) return;
 
-                var target = (
-                    me.Prefs["noOverride"+F]
-                    || me.Prefs["noOverrideAllFacilities"]
-                ) ? "pre" : "post";
+                var target = Util.pick([
+                        [me.Prefs["allowOverride"+F]]
+                        , [me.Prefs["allowOverrideAllFacilities"]]
+                        , [false]
+                ]) ? "post" : "pre";
 
                 fac[target].push([
                     srvName,
@@ -207,33 +209,36 @@ function PASAR(api, Options, cri) { //{{{
                 , outputFilters
             );//}}}
 
+            for (var i in spc.path) {
 
-            // Append main route://{{{
-            me.buildHandler(
-                spc.path
-                , method
-                , me.defaultFilter
-                , serviceHandler
-                , requestMapper
-                , responseMapper
-                , authHandler
-                , spc.ac
-            );
-            //}}}
+                // Append routes for all available output filters://{{{
+                if (! me.Prefs.noFilters) for (var ext in outputFilters) {
+                    me.buildHandler(
+                        spc.path[i]
+                        , method
+                        , [outputFilters[ext], ext]
+                        , serviceHandler
+                        , requestMapper
+                        , responseMapper
+                        , authHandler
+                        , spc.ac
+                    );
+                };//}}}
 
-            // Append routes for all available output filters://{{{
-            if (! me.Prefs.noFilters) for (var ext in outputFilters) {
+                // Append main route://{{{
                 me.buildHandler(
-                    spc.path
+                    spc.path[i]
                     , method
-                    , [outputFilters[ext], ext]
+                    , me.defaultFilter
                     , serviceHandler
                     , requestMapper
                     , responseMapper
                     , authHandler
                     , spc.ac
                 );
-            };//}}}
+                //}}}
+
+            };
 
         });
         // -------------------------------- //}}}

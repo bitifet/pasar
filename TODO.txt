@@ -13,7 +13,13 @@ TO-DO list:
         · "noOverride<FacName>" (noOverrideHelp, noOverrideForm, etc...)
         · "noOverrideAllFacilities" to avoid overridding any facility.
 
-  * Accept array as path parameter to deploy same service over multiple urls.
+  (DONE) Change all "noOverrideXXX" with equivalent "allowOverrideXXX", reversing logic and defaulting to true.
+    - This will be more consistent with future "allow(Filters)Override..." preferences.
+
+  * Implemented simetric "allowXXXFilterOverride" and "allowAllFiltersOverride" preferences for the same purpose.
+    - All defaults to false meaning that available filters are not overridable by routes.
+
+  (DONE) Accept array as path parameter to deploy same service over multiple urls.
     - Example: ["/foo/bar", "/foo/bar/:id]
 
   * Move to bluebird as default promise engine.
