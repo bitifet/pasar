@@ -80,9 +80,8 @@ function PASAR(api, Options, cri) { //{{{
                     [{}],
                 ])
             );
-            if (! me.Prefs.noHelp) {
-                me.indexFilters (fltIndex, outputFilters, method);
-            };//}}}
+            me.indexFilters (fltIndex, outputFilters, method);
+            //}}}
 
             var requestMapper = Util.pick([//{{{
                 [spc.requestMapper, method],
@@ -271,7 +270,7 @@ function PASAR(api, Options, cri) { //{{{
 };//}}}
 
 
-PASAR.prototype.indexRtHandler = function indexRtHandler(
+PASAR.prototype.indexRtHandler = function indexRtHandler(//{{{
     srvName         // Service Name.
     , method        // Method
     , rtHandler     // Actual handler.
@@ -308,8 +307,7 @@ PASAR.prototype.indexRtHandler = function indexRtHandler(
     };
 
     return me.services[srvName][method];
-};
-
+};//}}}
 
 PASAR.prototype.buildHandler = function buildHandler(//{{{
     pathSpec         // Base route path.
