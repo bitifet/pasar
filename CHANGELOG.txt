@@ -1,6 +1,8 @@
 CHANGELOG.txt
 =============
 
+    Improved form facility "reset" button behaviour.
+
 "version": "1.2.2" - Better usability and simpler modularization.
     Usability enhancements (templating / css) in form facility.
     Allow to provide API specification as an array of multiple groups of services for better modularization.
