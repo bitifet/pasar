@@ -62,6 +62,64 @@ function PASAR(api, Options, cri) { //{{{
             return rtPath;
         })(srvName, spc);//}}}
 
+
+        // Prepare service/facility routes: //{{{
+        // --------------------------------
+
+        var srvFacilities = (function(){
+
+            var fac = {
+                pre: [],
+                post: [],
+            };
+
+            var facilityAuthHandler =  Util.pick([ // Authentication Handler. //{{{
+                [spc.authHandler, "all"],
+                [spc.authHandler],
+                [me.Prefs.defaults, "authHandler.all"],
+                [me.Prefs.defaults, "authHandler"],
+                [Auth.defaultHandler] // Default.
+            ], Util.duckFn);//}}}
+            var facilityAC = Util.pick([ // Access Control properties. //{{{
+                [spc.ac],
+                [me.Prefs.ac],
+                {}
+            ], Util.duckFn);//}}}
+            Object.keys(Facilities).map(function(f){//{{{
+
+                var F = f[0].toUpperCase() + f.substring(1);
+
+                // Handle me.Prefs.noHelp, .noForm, etc...
+                if (me.Prefs["no"+F]) return;
+
+                var target = (
+                    me.Prefs["noOverride"+F]
+                    || me.Prefs["noOverrideAllFacilities"]
+                ) ? "pre" : "post";
+
+                fac[target].push([
+                    srvName,
+                    f,
+                    spc,
+                    Facilities[f],
+                    fltIndex,
+                    facilityAuthHandler,
+                    facilityAC
+                ]);
+
+
+            });//}}}
+
+            return fac;
+
+        })();
+
+        // -------------------------------- //}}}
+
+        srvFacilities.pre.map(function(f){
+            me.buildFacility.apply(me, f);
+        });
+
         // Build all service method routes: //{{{
         // --------------------------------
         Cfg.validMethods.map(function(method){
@@ -180,39 +238,9 @@ function PASAR(api, Options, cri) { //{{{
         });
         // -------------------------------- //}}}
 
-        // Build service/facility routes: //{{{
-        // ------------------------------
-
-        var facilityAuthHandler =  Util.pick([ // Authentication Handler. //{{{
-            [spc.authHandler, "all"],
-            [spc.authHandler],
-            [me.Prefs.defaults, "authHandler.all"],
-            [me.Prefs.defaults, "authHandler"],
-            [Auth.defaultHandler] // Default.
-        ], Util.duckFn);//}}}
-        var facilityAC = Util.pick([ // Access Control properties. //{{{
-            [spc.ac],
-            [me.Prefs.ac],
-            {}
-        ], Util.duckFn);//}}}
-        Object.keys(Facilities).map(function(f){//{{{
-
-            // Handle me.Prefs.noHelp, .noForm, etc...
-            if (me.Prefs["no" + f[0].toUpperCase() + f.substring(1)]) return;
-
-            me.buildFacility(
-                srvName,
-                f,
-                spc,
-                Facilities[f],
-                fltIndex,
-                facilityAuthHandler,
-                facilityAC
-            );
-
-        });//}}}
-
-        // ------------------------------ //}}}
+        srvFacilities.post.map(function(f){
+            me.buildFacility.apply(me, f);
+        });
 
     };
     // ================================//}}}
