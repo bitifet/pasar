@@ -3,6 +3,9 @@ RELEASE NOTES:
 ==============
 
 
+  TO-DO: Figure out why reset button stop working after first form submit in form facility and fix it.
+
+
   DONE: Modifyed request mapper to get url parameters "as is":
     - i.e.: "/foo/:section/bar/:id" will generate ':section' and ':id' vectors in service handler input.
 

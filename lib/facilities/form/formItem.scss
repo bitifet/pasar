@@ -1,0 +1,94 @@
+
+div.header {
+    position: fixed;
+    top: 0px;
+    bottom: 7em;
+}
+
+div.formWindow {
+    position: fixed;
+    top: 7em;
+    left: 1em;
+    width: calc(25% - 2em);
+    height: 100%;
+    overflow: hidden;
+    div.tabs>div {
+        background: #eeeeee;
+        margin-bottom: 4em;
+    }
+
+    div.form {
+        margin-bottom: 4em;
+        z-index: 0;
+
+        div.controls {
+            position: fixed;
+            top: 5em;
+            height: 2em;
+            width: 100%;
+            text-align: right;
+            right: 0px;
+            left: 0px;
+            background: #ccccdd;
+            z-index: 1;
+
+            ul {
+                list-style-type: none;
+                margin-right: 1em;
+                li {
+                    border-left: #ff0000 solid 3px;
+                    padding-left: .5em;
+                    margin-left: 1em;
+                    display: inline-block;
+                    height: 2em;
+                }
+
+            }
+
+
+        }
+
+        div.formContainer {
+            width: 100%;
+            margin: 0px;
+            margin-right: 14em;
+        }
+
+
+
+
+
+    }
+}
+
+
+div.resultsWindow {
+    position: fixed;
+    top: 7em;
+    bottom: 0px;
+    width: 75%;
+    right: 0px;
+    overflow: auto;
+    background: #eeeeee;
+
+    div.resultsContainer {
+        padding-top: 1em;
+    }
+
+    header button#clearResults {
+        float: right;
+        display: none;
+    }
+}
+
+.info {
+    cursor: help;
+}
+.error {
+    text-color: #990000;
+    cursor: help;
+}
+textarea {
+    width: 100%;
+    min-height: 15em;
+}
