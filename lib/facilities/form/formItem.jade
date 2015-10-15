@@ -63,14 +63,14 @@ block contents
         nav.menu
             a(href="../"+name) Index
         h1.
-            #{meta.title} Form (#{path})
+            #{meta.title} Form (#{path[0]})
         div.tabs
             ul
                 each f, name in methods
                     li(data-id=name)= name.toUpperCase()
             div
                 each f, name in methods
-                    div.form(data-id=name, data-path=path data-method=name)
+                    div.form(data-id=name, data-path=path[0] data-method=name)
                         div.fields !{f.tpl} 
                         div.controls
                             if f.error

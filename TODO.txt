@@ -22,5 +22,7 @@ TO-DO list:
   (DONE) Accept array as path parameter to deploy same service over multiple urls.
     - Example: ["/foo/bar", "/foo/bar/:id]
 
+  NOTE: Form facility now uses first defined path of any service by default. I think that allowing to select from each has no point except if interpolating fields to fill url parameters. Which is too much complicated compared in simply send colon-prefixed parameters in normal request which will have the same effect at least when using current default requestMapper.
+
   * Move to bluebird as default promise engine.
 
