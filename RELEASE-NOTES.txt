@@ -1,10 +1,12 @@
-TO-DO list:
-===========
+==============
+RELEASE NOTES:
+==============
 
-  (DONE) Modify request mapper to get url parameters "as is":
+
+  DONE: Modifyed request mapper to get url parameters "as is":
     - i.e.: "/foo/:section/bar/:id" will generate ':section' and ':id' vectors in service handler input.
 
-  (DONE) Fix facilities breaking when using url parameters by using serviceName instead of actual path. So:
+  DONE: Fixed facilities breaking when using url parameters by using serviceName instead of actual path. So:
     - «"foo/:bar": {_get:...}» will be broken anyway.
     - «"foo": {path:"foo/:bar",_get:...}»:
       º Service facilities will be attached to foo/facility_name (BUT OVERRIDDEN in this case).
@@ -13,16 +15,16 @@ TO-DO list:
         · "noOverride<FacName>" (noOverrideHelp, noOverrideForm, etc...)
         · "noOverrideAllFacilities" to avoid overridding any facility.
 
-  (DONE) Change all "noOverrideXXX" with equivalent "allowOverrideXXX", reversing logic and defaulting to true.
+  DONE: Changed all "noOverrideXXX" with equivalent "allowOverrideXXX", reversing logic and defaulting to true.
     - This will be more consistent with future "allow(Filters)Override..." preferences.
 
-  (DONE) Implemented simetric "allowXXXFilterOverride" and "allowAllFiltersOverride" preferences for the same purpose.
+  DONE: Implemented simetric "allowXXXFilterOverride" and "allowAllFiltersOverride" preferences for the same purpose.
     - All defaults to false meaning that available filters are not overridable by routes.
 
-  (DONE) Accept array as path parameter to deploy same service over multiple urls.
+  DONE: Accept array as path parameter to deploy same service over multiple urls.
     - Example: ["/foo/bar", "/foo/bar/:id]
 
   NOTE: Form facility now uses first defined path of any service by default. I think that allowing to select from each has no point except if interpolating fields to fill url parameters. Which is too much complicated compared in simply send colon-prefixed parameters in normal request which will have the same effect at least when using current default requestMapper.
 
-  * Move to bluebird as default promise engine.
+  DONE: Moved to bluebird as core promise engine.
 
