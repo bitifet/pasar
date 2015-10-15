@@ -1,6 +1,8 @@
 CHANGELOG.txt
 =============
 
+"version": "1.2.3" - Bluebird promise engine, better form facility experience and more...
+    Moved to bluebird as core promise engine.
     Improved form facility "reset" button behaviour.
     Updated default Request Mapper to map url parameters (":prmName") "as is" (colon-preffixed).
     Facilities are now addressed by serviceName uncontionally (ignoring service "path" when explicitly specified).
@@ -8,6 +10,10 @@ CHANGELOG.txt
     Accept array as path parameter to deploy same service over multiple urls.
     Implemented "allowXXXFilterOverride" and "allowAllFiltersOverride" preferences for the same purpose.
     Better form facility usability.
+    Implemented "data-autosubmit" attribute for form facility inputs to trigger form submit when:
+        - Change event is triggered in a <select> field.
+        - Enter key is pressed in other input types.
+    Added RELEASE-NOTES.txt file.
 
 "version": "1.2.2" - Better usability and simpler modularization.
     Usability enhancements (templating / css) in form facility.

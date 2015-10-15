@@ -189,6 +189,9 @@ FIXME
 
 FIXME
 
+  * data-autosubmit attribute.
+
+
 #### Field Types:
 
 ##### json
