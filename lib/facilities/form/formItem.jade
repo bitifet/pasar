@@ -20,6 +20,9 @@ block contents
                   each f, name in methods
                       div.form(data-id=name, data-path=path[0] data-method=name)
                           div.fields !{f.tpl} 
+                          div.formButtons
+                              button.reset Reset
+                              button.submit Submit
                           div.controls
                             ul
                                 if f.error
@@ -28,10 +31,6 @@ block contents
                                     - var hint="This is the default form template.  Use JSON data to provide your request parameters or configure specific form template in API definition.";
                                     li.info(title=hint)
                                         | (Default Form)
-                                li
-                                    button.reset Reset
-                                li
-                                    button.submit Submit
     div.resultsWindow
         div.resultsContainer
           header

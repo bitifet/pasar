@@ -12,10 +12,24 @@ div.formWindow {
   overflow: hidden; }
   div.formWindow div.tabs > div {
     background: #eeeeee;
-    margin-bottom: 4em; }
-  div.formWindow div.form {
     margin-bottom: 4em;
-    z-index: 0; }
+    height: 100%; }
+  div.formWindow div.form {
+    z-index: 0;
+    position: relative;
+    height: 100%;
+    width: 100%;
+    margin-bottom: 2px; }
+    div.formWindow div.form div.fields {
+      padding-bottom: 4em; }
+    div.formWindow div.form div.formButtons {
+      position: absolute;
+      bottom: 0px;
+      border-top: #000000 solid 1px;
+      padding-top: .5em;
+      left: 1em;
+      right: 1em;
+      text-align: right; }
     div.formWindow div.form div.controls {
       position: fixed;
       top: 5em;
@@ -35,10 +49,13 @@ div.formWindow {
           margin-left: 1em;
           display: inline-block;
           height: 2em; }
-    div.formWindow div.form div.formContainer {
-      width: 100%;
-      margin: 0px;
-      margin-right: 14em; }
+  div.formWindow div.formContainer {
+    width: 100%;
+    margin: 0px;
+    margin-right: 14em; }
+    div.formWindow div.formContainer input:not([type=checkbox]), div.formWindow div.formContainer select, div.formWindow div.formContainer textarea {
+      max-width: 50%;
+      width: 50%; }
 
 div.resultsWindow {
   position: fixed;

@@ -15,11 +15,30 @@ div.formWindow {
     div.tabs>div {
         background: #eeeeee;
         margin-bottom: 4em;
+        height: 100%;
     }
 
     div.form {
-        margin-bottom: 4em;
         z-index: 0;
+        position: relative;
+        height: 100%;
+        width: 100%;
+        margin-bottom:2px;
+
+        div.fields {
+            padding-bottom: 4em;
+
+        };
+
+        div.formButtons {
+            position: absolute;
+            bottom: 0px;
+            border-top: #000000 solid 1px;
+            padding-top: .5em;
+            left: 1em;
+            right: 1em;
+            text-align: right;
+        }
 
         div.controls {
             position: fixed;
@@ -48,17 +67,19 @@ div.formWindow {
 
         }
 
-        div.formContainer {
-            width: 100%;
-            margin: 0px;
-            margin-right: 14em;
-        }
-
-
-
-
-
     }
+
+    div.formContainer {
+        width: 100%;
+        margin: 0px;
+        margin-right: 14em;
+
+        input:not([type=checkbox]), select, textarea {
+            max-width: 50%;
+            width: 50%;
+        }
+    }
+
 }
 
 

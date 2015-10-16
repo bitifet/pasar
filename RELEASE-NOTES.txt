@@ -3,7 +3,7 @@ RELEASE NOTES:
 ==============
 
 
-  TO-DO: Figure out why reset button stop working after first form submit in form facility and fix it.
+  DONE: Fixed reset button stop working after first form submit in form facility.
 
 
 "version": "1.2.3" - Bluebird promise engine, better form facility experience and more...
