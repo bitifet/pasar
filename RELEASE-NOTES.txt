@@ -5,6 +5,9 @@ RELEASE NOTES:
 
   DONE: Fixed reset button stop working after first form submit in form facility.
 
+  DONE: Allow to provide file path instead of actual Jade template source in
+        html output filter. Allowing, hence, to use includes and more...
+
 
 "version": "1.2.3" - Bluebird promise engine, better form facility experience and more...
 -----------------------------------------------------------------------------------------
