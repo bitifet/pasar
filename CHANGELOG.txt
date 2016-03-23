@@ -2,8 +2,10 @@ CHANGELOG.txt
 =============
 
 
+"version": "1.2.4" - Allow Jade files instead of only source strings or arrays.
+
     Allow to provide file path instead of actual Jade template source in html output filter.
-    Other minor fixes.
+    Fixed form facility reset button and other minor changes.
 
 "version": "1.2.3" - Bluebird promise engine, better form facility experience and more...
     Moved to bluebird as core promise engine.
