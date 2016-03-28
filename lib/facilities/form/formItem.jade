@@ -23,6 +23,13 @@ block contents
                           div.formButtons
                               button.reset Reset
                               button.submit Submit
+                              if Object.keys(filters).length
+                                select.download
+                                  option(selected,disabled,value="")="Download as..."
+                                  each fitems, ext in filters
+                                      each fdata, k in fitems
+                                          option(value=ext)=ext
+
                           div.controls
                             ul
                                 if f.error

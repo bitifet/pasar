@@ -184,6 +184,8 @@ Output Filters
       - Examples (Jade):
         - option(data-from="someApiFn")
         - option(data-from="someOthesApiFn", data-path="foo.bar.baz", data-key="keyFld", data-value="descFld")
+    - Integrated response view (thought html output filter) for inspection. 
+    - Download capability for all available output filters.
 
 
 ### <a name="featAdvanced"></a>Advanced Features
