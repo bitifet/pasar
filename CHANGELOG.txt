@@ -2,12 +2,16 @@ CHANGELOG.txt
 =============
 
 
+"version": "1.2.7" - Improved html output filter.
+    Now fully Jade-engine based thought default adaptative template.
+    Without headers on Ajax requests.
+    Improved defaul output filter request handler to pass xhr from original request.
+
 "version": "1.2.6" - Shift+Ctrl-Click to enable/disable multiple selection in form facility combo boxes.
 
 "version": "1.2.5" - Download capability in form facility for all available output filters.
 
 "version": "1.2.4" - Allow Jade files instead of only source strings or arrays.
-
     Allow to provide file path instead of actual Jade template source in html output filter.
     Fixed form facility reset button and other minor changes.
 

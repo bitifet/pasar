@@ -391,10 +391,17 @@ PASAR.prototype.buildHandler = function buildHandler(//{{{
     // Optional request handler to retrieve runtime options for output filter.
     var ofReqHandler = (typeof outputFilter.requestHandler == "function")
         ? outputFilter.requestHandler
-        : function (req) {return {};} // (Default)
+        : function (req) { // (Default)
+            // NOTE: Output filters are usually expected to NOT depend on request input.
+            //  ...but somtimes could be useful to slightly alter formating depending on
+            //  request attributes such xhr that indicates we are responding to
+            //  AJAX request so, for example, html output filters, probably
+            //  should not render html headers.
+            return {
+                xhr: req.xhr, // Request is XMLHttpRequest (AJAX)
+            };
+        }
     ;
-    // NOTE: Output filters are usually expected to NOT depend on request input.
-    //  ...but, defining a requestHandler property over them, you could easily change that.
 
     // --------------------------------//}}}
 
