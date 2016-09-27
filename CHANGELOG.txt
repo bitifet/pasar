@@ -1,6 +1,7 @@
 CHANGELOG.txt
 =============
 
+"version": "1.2.8" - Protection against possible output filters input messing.
 
 "version": "1.2.7" - Improved html output filter.
     Now fully Jade-engine based thought default adaptative template.

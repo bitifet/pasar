@@ -1,6 +1,6 @@
 {
   "name": "pasar",
-  "version": "1.2.7",
+  "version": "1.2.8",
   "description": "Promise Aware Smart API REST builder to easily implement Express routers with advanced capabilities.",
   "main": "index.js",
   "scripts": {
@@ -30,6 +30,7 @@
     "bluebird": "^2.10.2",
     "deasync": "^0.1.0",
     "express": "~4.12.4",
+    "extend": "^3.0.0",
     "jade": "^1.11.0",
     "json2xls-xml": "0.0.12"
   }
