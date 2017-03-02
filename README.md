@@ -59,7 +59,7 @@ Service definitions consists in an object with one or more attributes. Simples't
 
 ```javascript
     myServiceName: {
-        _all: function myFunction(input, ac) { // Use _get, _post, etc.. to attach your handler to specific http method.
+        _all: function myActionFunction(input, ac) { // Use _get, _post, etc.. to attach your handler to specific http method.
             // input: Your input data. No matter if send by get, post, put, etc...
             //     ...but you can fine-tune this by overridding default request mapper.
             // auth: FIXME: Document it!!.
@@ -92,6 +92,14 @@ If your API grows too much, you can provide an array of smaller service definito
     ];
 
 ```
+
+Action functions are expected to return a promise but they are actually able to
+directly return a result (which is automatically promisified).
+
+On promise rejections (or thrown errors) an http 500 error code (Internal
+Server Error) is send to the client and, from version 1.2.14, if *logErrors*
+option is not set to *false*, the error/rejection message is logged to stderr
+(except ).
 
 
 (See more complete [examples]() later...)
@@ -254,16 +262,17 @@ All API definitions should look's like follows:
     var Pasar = require("pasar");
 
     var Options = { // Comment-out / modify as you need...
-        // noLib: true,     // ...to disable .fn and .syncFn facilites.
-        // noHelp: true,    // ...to disable /help facilities.
-        // noForm: true,    // ...to disable /form facilities.
-        // noFilters: true, // ...to disable optional formatting filters.
-        // "defaults.help.examples.get": [{}], // ...to automatically provide all your functions help with simple example.
-        // "defaults.authHanlder": myAuthHandler, // ...to sepcify your own authentication handler.
-        // "defaults.requestMapper": myRequestMapper, // ...to sepcify your own request mapper.
+        // logErrors: false,                            // ...to disable rejection logging.
+        // noLib: true,                                 // ...to disable .fn and .syncFn facilites.
+        // noHelp: true,                                // ...to disable /help facilities.
+        // noForm: true,                                // ...to disable /form facilities.
+        // noFilters: true,                             // ...to disable optional formatting filters.
+        // "defaults.help.examples.get": [{}],          // ...to automatically provide all your functions help with simple example.
+        // "defaults.authHanlder": myAuthHandler,       // ...to sepcify your own authentication handler.
+        // "defaults.requestMapper": myRequestMapper,   // ...to sepcify your own request mapper.
         // "defaults.responseMapper": myResponseMapper, // ...to sepcify your own response mapper.
-        // promiseEngine: myPromiseEngine, // ...to provide your own promise engine.
-        // "client.jQuery": "url_to_jQuery" // ...to override jQuery path in facility views.
+        // promiseEngine: myPromiseEngine,              // ...to provide your own promise engine.
+        // "client.jQuery": "url_to_jQuery"             // ...to override jQuery path in facility views.
         // ... (See documentation for more details on available options).
     };
 

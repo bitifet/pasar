@@ -1,7 +1,10 @@
 CHANGELOG.txt
 =============
 
-"version": "1.2.12" - BUGFIX: Fixed Array output messing rom v.1.2.9
+"version": "1.2.14" - Log rejections to stderr by default.
+    (Can be disabled by setting *logErrors* option to false)
+
+"version": "1.2.13" - BUGFIX: Fixed Array output messing rom v.1.2.9
     Protection against possible output filters input messing introduced in
     v.1.2.9 broke serviches having array responses because extending non Array
     objects with an Array doesn't result in an Array but only an object with

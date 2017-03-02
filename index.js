@@ -11,6 +11,7 @@
 "use strict";
 var Path = require("path");
 var Express = require("express");
+var Chalk = require("chalk");
 var Cfg = require("./cfg.js");
 var Util = require("./lib/util.js");
 var Auth = require("./lib/auth.js");
@@ -342,7 +343,7 @@ PASAR.prototype.indexRtHandler = function indexRtHandler(//{{{
         /**/ arguments[3] = pbk;
 
         var p = rtHandler.apply(me.services, arguments);
-        return timeOut 
+        var serviceHandler = timeOut
             ? new me.R.Promise(function(resolve, reject){
                 var t = setTimeout(
                     function(){
@@ -359,6 +360,19 @@ PASAR.prototype.indexRtHandler = function indexRtHandler(//{{{
             })
             : p
         ;
+
+        if (me.Prefs.logErrors) {
+            serviceHandler.catch(function(err){
+                console.error(
+                    Chalk.bgRed("SERVICE_ERROR")
+                    +Chalk.red(" ("+srvName+")")
+                    + ":"
+                    , err
+                );
+            });
+        };
+
+        return serviceHandler;
     };
 
     return me.services[srvName][method];
@@ -587,6 +601,9 @@ PASAR.prototype.buildPrefs = function applyDefaultPreferences(Options) {//{{{
 
     // Define default timeout message:
     Util.propSet(prefs, "defaultTimeoutMessage", Cfg.defaultTimeoutMessage);
+
+    // Initialize logErrors:
+    Util.propSet(prefs, "logErrors", Cfg.defaultLogErrors);
 
     return prefs;
 

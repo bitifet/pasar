@@ -13,6 +13,7 @@ module.exports = {
     corePromiseEngine: "bluebird",
     defaultOutputFilter: "json",
     defaultTimeoutMessage: "Timeout!",
+    defaultLogErrors: true,
     tplBriefLenght: 400,
     validMethods: ['get', 'post', 'put', 'delete', 'all'],
     statIdx: {
