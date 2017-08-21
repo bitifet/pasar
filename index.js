@@ -8,6 +8,18 @@
 // @company: GEIBSAU
 // @license: GPL
 //
+//
+// Usage example:
+// --------------
+//
+// var Pasar = require("pasar");
+//
+// To build API instance:
+// var myApiRouter = new Pasar(apiSpec, Options);
+//
+// ...or simply:
+// var myApiRouter = Pasar(apiSpec, Options);
+
 "use strict";
 var Path = require("path");
 var Express = require("express");
@@ -663,15 +675,4 @@ function apiBuilder (apiSpec, Options, cri) {//{{{
 apiBuilder.prototype = PASAR;//}}}
 
 module.exports = apiBuilder;
-
-// Usage example:
-// ==============
-//
-// var Pasar = require("pasar");
-//
-// To build API instance:
-// var myApiRouter = new Pasar(apiSpec, Options);
-//
-// ...or simply:
-// var myApiRouter = Pasar(apiSpec, Options);
 
