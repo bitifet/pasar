@@ -102,7 +102,7 @@ option is not set to *false*, the error/rejection message is logged to stderr
 (except ).
 
 
-(See more complete [examples]() later...)
+(See more complete [examples](#examples) later...)
 
 
 ### <a name="definitions"></a>Definitions
@@ -133,8 +133,28 @@ Output Filters
 ### <a name="abstractNotes"></a>Notes
 
 
-  * We can attach same function to any of the ``_get``, ``_post``, ``_put`` and/or ``_delete`` or simply to ``_all`` (which attaches it to all methods except explicitly specified thought ``_get``, ``_post``, etc...). But actins never knows about actual requested method. So, if we want different behaviour, for example, in GET requests than in POST ones, we should specify our own Request Mapper to provide propper Action input depending on the actual request method.
+#### POST / PUT / DELETE processing:
 
+PASAR does not implement POST processings itself. Instead expects proper
+middlewares to be used by our app. (If they are not used, POST (or PUT /
+DELETE) data will not be detected). This middlewares are:
+
+  * [body-parser](https://www.npmjs.com/package/body-parser): For regular url-encoded or json requests. Examples:
+
+
+    app.use(bodyParser.urlencoded({ extended: false }));
+    app.use(bodyParser.json());
+
+
+  * [express-fileupload](https://www.npmjs.com/package/express-fileupload): For multipart requests (Ex with forms like `<form enctype="multipart/form-data" ...>`).
+
+
+    app.use(fileUpload());
+
+
+#### Misc:
+
+  * We can attach same function to any of the ``_get``, ``_post``, ``_put`` and/or ``_delete`` or simply to ``_all`` (which attaches it to all methods except explicitly specified thought ``_get``, ``_post``, etc...). But actions never knows about actual requested method. So, if we want different behaviour, for example, in GET requests than in POST ones, we should specify our own Request Mapper to provide propper Action input depending on the actual request method.
 
 
 <a name="features"></a>Features
@@ -245,7 +265,7 @@ Output Filters
 <a name="documentation"></a>Documentation
 -----------------------------------------
 
-Currently the only existing documentation consist in below [examples](#examples) and an uncomplete [Usage Manual](doc/Manual.md).
+Currently the only existing documentation consist in below [examples](#examples) and an incomplete [Usage Manual](doc/Manual.md).
 
 Maybe you would like to help in building better one... (see [Contributing](#contributing))
 
@@ -253,6 +273,8 @@ Maybe you would like to help in building better one... (see [Contributing](#cont
 
 <a name="examples"></a>Examples
 -------------------------------
+
+Below are documentary examples. If you need fully functional examples see [PASAR demos](https://github.com/bitifet/pasar/tree/master/doc/demos).
 
 All API definitions should look's like follows:
 
@@ -366,21 +388,32 @@ All API definitions should look's like follows:
 
 
 
-Then, to mount your API REST to your Express router simply:
+Then, to mount your API REST to your Express app or router simply:
 
 ```javascript
-    var Express = require('express');
-    var Router = Express.Router();
-
     // Load API definitions:
     var someAPI = require("__path_to_my_api__");
     var someOtherAPI = require("__path_to_my_other_api__");
 
-    // To mount your api at /api route:
-    Router.use('/api', someAPI);
+    // REST API usage:
+    // ===============
 
-    // To mount your api at your router root:
-    Router.use(someOtherAPI);
+    // Having your Express app is 'app' variable...
+
+    // To mount your api at /api route:
+    app.use('/api', someAPI);
+    // ...Or symply 'app.use("/api", require("__path_to_my_api__"))'
+
+    // To mount your api at your app root:
+    app.use(someOtherAPI);
+    // ...Or simply 'app.use(require("__path_to_my_other_api__"))'
+
+    // Of course, you also can mount it on existing express router's subpath or root:
+    myRouter.use(...);
+
+
+    // Usage as internal library:
+    // ==========================
 
     // To access Services as library:
     someApi.fn.someFunction.get({foo: "bar"})
@@ -389,8 +422,10 @@ Then, to mount your API REST to your Express router simply:
     ;
 
     // Also with available output filters:
-    var resultPromise = somApi.fn["someFunction.html"]({foo: "bar"}); // Promise. Use .then(), .catch()...
+    var resultPromise = somApi.fn["someFunction.html"]({foo: "bar"});
+        // Returns promise (Use .then(), .catch()...)
         // ".get", ".post", etc... can be ommited when only one method is implemented.
+    // ...Or simply 'var myAsyncLib = require("__path_to_my_api__").fn;'
 
     // To access Services as sync library:
     var result = someApi.syncFn.someFunction({foo: "bar"});
@@ -399,11 +434,7 @@ Then, to mount your API REST to your Express router simply:
         //      * They are not availible in Node versions under v0.11.0.
         //      * In earlier Node versions, it will throw an exception if you try to use it.
         //      * Not yet tested (sorry) could not properly work even with node v0.11.0 or higher.
-
-    // Or simply:
-    // Router.use('/api', require("__path_to_my_api__"))  // Mounted on /api.
-    // Router.use(require("__path_to_my_other_api__"))    // Mounted on root.
-    // var myAsyncLib = require("__path_to_my_api__").fn; // Async (returns promises).
+    // ...Or simply 'var mySyncLib = require("__path_to_my_api__").syncFn;'
 
 ```
 
