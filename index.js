@@ -354,7 +354,7 @@ PASAR.prototype.indexRtHandler = function indexRtHandler(//{{{
         /**/ arguments[2] = me.cri; // (Common Resources Interface)
         /**/ arguments[3] = pbk;
 
-        var p = rtHandler.apply(me.services, arguments);
+        var p = me.R.Promise.resolve(rtHandler.apply(me.services, arguments));
         var serviceHandler = timeOut
             ? new me.R.Promise(function(resolve, reject){
                 var t = setTimeout(
