@@ -137,50 +137,50 @@ function PASAR(api, Options, cri) { //{{{
 
         // Build all service method routes: //{{{
         // --------------------------------
-        Cfg.validMethods.map(function(method){
+        Cfg.validMethods.map(function(srvMethod){
 
             // Get route Handler (Controller)://{{{
-            var rtHandler = spc["_" + method];
+            var rtHandler = spc["_" + srvMethod];
             if (rtHandler === undefined) return; // Avoid trying to map unspecified method handlers.
             //}}}
 
             var outputFilters = Fmt.load(//{{{
                 me.Filters
                 , Util.pick([
-                    [spc.outputFilters, method],
+                    [spc.outputFilters, srvMethod],
                     [spc.outputFilters, "all"],
                     [spc.outputFilters],
                     [{}],
                 ])
             );
-            me.indexFilters (fltIndex, outputFilters, method);
+            me.indexFilters (fltIndex, outputFilters, srvMethod);
             //}}}
 
             var requestMapper = Util.pick([//{{{
-                [spc.requestMapper, method],
+                [spc.requestMapper, srvMethod],
                 [spc.requestMapper, "all"],
                 [spc.requestMapper],
-                [me.Prefs.defaults, "requestMapper."+method],
+                [me.Prefs.defaults, "requestMapper."+srvMethod],
                 [me.Prefs.defaults, "requestMapper.all"],
                 [me.Prefs.defaults, "requestMapper"],
                 [defaultRequestMapper] // Default.
             ], Util.duckFn);//}}}
 
             var responseMapper = Util.pick([//{{{
-                [spc.responseMapper, method],
+                [spc.responseMapper, srvMethod],
                 [spc.responseMapper, "all"],
                 [spc.responseMapper],
-                [me.Prefs.defaults, "responseMapper."+method],
+                [me.Prefs.defaults, "responseMapper."+srvMethod],
                 [me.Prefs.defaults, "responseMapper.all"],
                 [me.Prefs.defaults, "responseMapper"],
                 [defaultResponseMapper] // Default.
             ], Util.duckFn);//}}}
             
             var authHandler = Util.pick([//{{{
-                [spc.authHandler, method],
+                [spc.authHandler, srvMethod],
                 [spc.authHandler, "all"],
                 [spc.authHandler],
-                [me.Prefs.defaults, "authHandler."+method],
+                [me.Prefs.defaults, "authHandler."+srvMethod],
                 [me.Prefs.defaults, "authHandler.all"],
                 [me.Prefs.defaults, "authHandler"],
                 [Auth.defaultHandler] // Default.
@@ -189,7 +189,7 @@ function PASAR(api, Options, cri) { //{{{
             // Sanityze timeout parameter://{{{
             // ---------------------------
             var timeOut = Util.pick([
-                [spc.timeout, method],
+                [spc.timeout, srvMethod],
                 [spc.timeout, "all"],
                 [spc.timeout]
             ]);
@@ -210,7 +210,7 @@ function PASAR(api, Options, cri) { //{{{
 
             var serviceHandler = me.indexRtHandler(
                 srvName
-                , method
+                , srvMethod
                 , rtHandler
                 , timeOut
             );
@@ -218,7 +218,7 @@ function PASAR(api, Options, cri) { //{{{
             if (! me.Prefs.noLib) me.exposeCallable (//{{{
                 fName
                 , serviceHandler
-                , method
+                , srvMethod
                 , outputFilters
             );//}}}
 
@@ -242,7 +242,7 @@ function PASAR(api, Options, cri) { //{{{
 
                     flt[target].push([
                         spc.path[i]
-                        , method
+                        , srvMethod
                         , [outputFilters[ext], ext]
                         , serviceHandler
                         , requestMapper
@@ -259,7 +259,7 @@ function PASAR(api, Options, cri) { //{{{
                 // Append main route://{{{
                 me.buildHandler(
                     spc.path[i]
-                    , method
+                    , srvMethod
                     , me.defaultFilter
                     , serviceHandler
                     , requestMapper
@@ -319,11 +319,11 @@ function PASAR(api, Options, cri) { //{{{
 
     // Shorthand for single-method functions://{{{
     if (! me.Prefs.noLib) Object.keys(me.R.fn).filter(function(k){
-        var methods = Object.keys(me.R.fn[k]);
+        var srvMethods = Object.keys(me.R.fn[k]);
         if ( // Function has only one (get/post/.../all) method.
-            methods.length === 1
+            srvMethods.length === 1
         ) { // Let to access it directly as me.R.fn[fName]() without ".get", ".post", etc..
-            var mtd = methods[0];
+            var mtd = srvMethods[0];
             var asyncFn = me.R.fn[k][mtd];
             var syncFn = me.R.syncFn[k][mtd];
             me.R.fn[k] = asyncFn;
@@ -431,13 +431,13 @@ PASAR.prototype.buildHandler = function buildHandler(//{{{
 
     // --------------------------------//}}}
 
-    // Determine actual method://{{{
-    // ------------------------
-    var method = (service[0] == "/")
+    // Determine actual service method://{{{
+    // --------------------------------
+    var srvMethod = (service[0] == "/")
         ? "get"     // Facilitiy. Always called thought GET method.
         : service   // Actual service method handler.
     ;
-    // ------------------------//}}}
+    // --------------------------------//}}}
 
     // Autocomplete routePath://{{{
     // -----------------------
@@ -479,7 +479,7 @@ PASAR.prototype.buildHandler = function buildHandler(//{{{
 
     // Build and route service://{{{
     // ------------------------
-    me.R[method](routePath, function (req,res,next) {
+    me.R[srvMethod](routePath, function (req,res,next) {
 
         var auth = Auth.trust(
             authHandler,
@@ -495,7 +495,7 @@ PASAR.prototype.buildHandler = function buildHandler(//{{{
         if (! auth) return;
 
         var input = ctrl(
-            requestMapper(req, method) // Our function input data.
+            requestMapper(req, srvMethod) // Our function input data.
             , auth
         );
 
@@ -516,7 +516,7 @@ PASAR.prototype.buildHandler = function buildHandler(//{{{
 
 };//}}}
 
-PASAR.prototype.indexFilters = function (target, fdata, method) {//{{{
+PASAR.prototype.indexFilters = function (target, fdata, srvMethod) {//{{{
     for (var ext in fdata) {
         var contents = fdata[ext].help;
         if (! contents) contents = ext + " output formatter"; // Description failback.
@@ -526,7 +526,7 @@ PASAR.prototype.indexFilters = function (target, fdata, method) {//{{{
             contents: contents,
             methods: [],
         };
-        target[ext][key].methods.push(method);
+        target[ext][key].methods.push(srvMethod);
     };
 };//}}}
 
@@ -576,7 +576,7 @@ PASAR.prototype.buildRootFacility = function buildRootFacility (//{{{
         , "/"+facName
         , facility.tpl.index   // Directly injected Output formatter.
         , Util.dumbFn
-        , function(req, method) {
+        , function(req, srvMethod) {
             var model = {
                 path: req.baseUrl,
                 name: facName,
@@ -636,7 +636,7 @@ PASAR.prototype.exposeCallable = (function(){//{{{
         };
     };//}}}
 
-    return function buildCallable(srvName, handler, method, Filters){ // Expose handler as callable function://{{{
+    return function buildCallable(srvName, handler, srvMethod, Filters){ // Expose handler as callable function://{{{
 
         var me = this;
 
@@ -650,8 +650,8 @@ PASAR.prototype.exposeCallable = (function(){//{{{
             me.R.fn[srvName] = {};
             me.R.syncFn[srvName] = {};
         };
-        me.R.fn[srvName][method] = buildFunction(me.R, handler, me.defaultFilter);
-        me.R.syncFn[srvName][method] = Util.depromise(me.R.fn[srvName][method]);
+        me.R.fn[srvName][srvMethod] = buildFunction(me.R, handler, me.defaultFilter);
+        me.R.syncFn[srvName][srvMethod] = Util.depromise(me.R.fn[srvName][srvMethod]);
 
         // For all available filters:
         if (! me.Prefs.noFilters) for (var ext in Filters) {
@@ -660,8 +660,8 @@ PASAR.prototype.exposeCallable = (function(){//{{{
                 me.R.syncFn[srvName+"."+ext] = {};
             };
             var f = buildFunction(me.R, handler, Filters[ext]);
-            me.R.fn[srvName+"."+ext][method] = f;
-            me.R.syncFn[srvName+"."+ext][method] = Util.depromise(f);
+            me.R.fn[srvName+"."+ext][srvMethod] = f;
+            me.R.syncFn[srvName+"."+ext][srvMethod] = Util.depromise(f);
         };
 
     }; //}}}
