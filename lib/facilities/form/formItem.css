@@ -30,25 +30,52 @@ div.formWindow {
       left: 1em;
       right: 1em;
       text-align: right; }
+      div.formWindow div.form div.formButtons * {
+        font-size: x-small; }
     div.formWindow div.form div.controls {
       position: fixed;
+      margin: 0px;
+      padding: 0px;
       top: 5em;
       height: 2em;
       width: 100%;
-      text-align: right;
       right: 0px;
       left: 0px;
       background: #ccccdd;
       z-index: 1; }
       div.formWindow div.form div.controls ul {
-        list-style-type: none;
-        margin-right: 1em; }
+        margin: 0px;
+        padding: 0px;
+        border: 0px;
+        position: absolute; }
         div.formWindow div.form div.controls ul li {
-          border-left: #ff0000 solid 3px;
-          padding-left: .5em;
-          margin-left: 1em;
-          display: inline-block;
-          height: 2em; }
+          color: #000077;
+          text-decoration: none;
+          display: inline-block; }
+          div.formWindow div.form div.controls ul li:not(.info) {
+            background-color: #dddddd;
+            border: #ffffff solid 1px;
+            cursor: pointer; }
+        div.formWindow div.form div.controls ul.tabbar {
+          bottom: 0px;
+          left: 1em;
+          list-style-type: none; }
+          div.formWindow div.form div.controls ul.tabbar li {
+            border-radius: 0px 9px 0px 0px;
+            border-right: #ffffff solid 2px;
+            border-bottom: 0px;
+            margin: 0px;
+            padding: 0px;
+            padding-right: .5em;
+            margin-left: .1em;
+            text-align: left; }
+        div.formWindow div.form div.controls ul.buttons {
+          bottom: 3px;
+          right: 1em;
+          list-style-type: none; }
+          div.formWindow div.form div.controls ul.buttons li {
+            margin-right: 1em;
+            text-align: center; }
   div.formWindow div.formContainer {
     width: 100%;
     margin: 0px;

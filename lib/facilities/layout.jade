@@ -23,8 +23,9 @@ html
             }
             /* NAV MENÚ: {{{ */
             nav.menu {
-                top: 0px;
-                float: right;
+                position: fixed;
+                top: 1em;
+                right: .5em;
             }
             nav.menu a {
                 padding: .5em;
@@ -63,9 +64,10 @@ html
                 border-left: #000055 solid 1px;
                 margin-right: 12px;
             }
-            .tabs>ul li.selected {
-                background: #ccddee;
-                border-bottom: #000055 solid 3px;
+            .tabs>ul li.selected
+            , ul.tabbar li.selected
+            {
+                background: #ccddee !important;
             }
             .tabs>div {
                 border: #999999 solid 1px;
@@ -79,7 +81,11 @@ html
     block contents
     script.
         $(".tabs").each(function() {
-            var tabs = $("ul", this).first().find("li");
+            var tabs = $("ul.tabbar", this).find("li");
+            if (! tabs.length) { // Backward compatibility failback.
+                // FIXME: Check if this is really needed somewhere (I think not!)
+                tabs = $("ul.tabbar", this).first().find("li");
+            };
             var panes = $("div", this).first().children("div");
 
             panes.hide();
@@ -90,7 +96,7 @@ html
                 var p = panes.filter(function(i, p){return $(p).data("id") == k;});
                 t.click(function() {
                     tabs.removeClass("selected");
-                    t.addClass("selected");
+                    tabs.filter("[data-id="+k+"]").addClass("selected");
                     panes.hide();
                     p.show();
                 });
