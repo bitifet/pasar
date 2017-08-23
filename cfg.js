@@ -15,7 +15,7 @@ module.exports = {
     defaultTimeoutMessage: "Timeout!",
     defaultLogErrors: true,
     tplBriefLenght: 400,
-    validMethods: ['get', 'post', 'put', 'delete', 'all'],
+    validMethods: ['get', 'post', 'put', 'delete', 'patch', 'all'],
     statIdx: {
         ok: 200,
         forbidden: 403,
