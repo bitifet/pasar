@@ -2,6 +2,8 @@ CHANGELOG.txt
 =============
 
 
+"version": "1.3.4" - Minor fix: Removed (forgiven) testing code in template.
+
 "version": "1.3.3" - More consistend form submission in form facility.
 
 "version": "1.3.2" - Improved html output filter table-like array detection.
