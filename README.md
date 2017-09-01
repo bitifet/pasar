@@ -449,6 +449,14 @@ Then, to mount your API REST to your Express app or router simply:
 
   * Promise-level caching.
 
+  * Make it NESTABLE: If another PASAR router is passed instead of service definition:
+    - Mount it at that route.
+    - Make facility indexes nest too.
+
+  * Unified backend (usability + avoid collisions between services and facilities):
+    - Unify all facilities into single index mounted at root (/).
+    - Move all facility-related routes under double slash route (ex: //help/srv_route)
+
   * WebSocket update events interface (DRAFT).
     - Sometimes data provided by a REST API becomes outdated too shortly.
     - WebSocket update events if enabled, will provide your method handlers with an "update callback" as a second parameter.
