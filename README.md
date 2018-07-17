@@ -443,6 +443,10 @@ Then, to mount your API REST to your Express app or router simply:
 <a name="TODO"></a> TODO
 ------------------------
 
+  * Let's use promise rejection to generate valid http error responses.
+    - Nowadays rejections generate HTTP 500 (internal server error) unconditionally.
+    - Let's provide a way to use rejections to pick propper error codes and
+      even messages to display.
   * Make requirement of 'meta' and 'data' vectors in returned data to be configurable.
     - Nowadays it is autodetected: If 'data' vector is present, it is used as
       actual result and, if 'meta' is present too, it is used as metadata. Else
