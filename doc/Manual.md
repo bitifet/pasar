@@ -130,7 +130,7 @@ Api specification consists in an object in the form:
 
 Each service specification consists of one or more of the below properties:
 
-### <a name="spcMethods"></a>[\_get, \_post, \_put, \_delete, \_all] method implementations.
+### <a name="spcMethods"></a>[\_get, \_post, \_put, \_patch, \_delete, \_all] method implementations.
 
 FIXME
 

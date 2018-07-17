@@ -443,6 +443,24 @@ Then, to mount your API REST to your Express app or router simply:
 <a name="TODO"></a> TODO
 ------------------------
 
+  * Make requirement of 'meta' and 'data' vectors in returned data to be configurable.
+    - Nowadays it is autodetected: If 'data' vector is present, it is used as
+      actual result and, if 'meta' is present too, it is used as metadata. Else
+      case, whole returning value is used as data assuming no metadata.
+    - This behaviour become weird when this structure is not used but returning
+      value could accidentally contain a 'data' vector.
+    - To fix this problem, this behaviour will be configurable thought a
+      property called 'usemeta' (or similar).
+    - This property will accept three possible values:
+      + true: Which will force the use of {meta: ..., data: ...} structure
+        (with 'data' vector being required).
+      + false: Direct data returning (without metadata) will be assumed, EVEN
+        'data' and/or 'meta' vectors present.
+      + "auto": For current behaviour.
+    - To preserve backward compatibility, "auto" will be the default. But at
+      next major release it will move to false. **So starting to globally
+      override it is highly adviced.**
+
   * Posibility to execute predefined tests clientside thought /test facilities.
 
   * Configurable logging capabilites (including time measurement).
