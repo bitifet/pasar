@@ -209,7 +209,7 @@ DELETE) data will not be detected). This middlewares are:
   * Easy querying while developing with automated (but customizable) '/form' facilities.
     - Accepting 'json' as input field type (being the default if unspecified).
     - With 'select' combo-boxes options feedable thought API requests:
-      - Examples (Jade):
+      - Examples (Pug):
         - option(data-from="someApiFn")
         - option(data-from="someOthesApiFn", data-path="foo.bar.baz", data-key="keyFld", data-value="descFld")
     - Integrated response view (thought html output filter) for inspection. 

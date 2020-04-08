@@ -224,9 +224,9 @@ This is performed following below rules:
     - data-fkeys: Allow to specify filters (foreign keys) based on other combo-boxes selected option. Syntax: foreignFieldName=colunName[,...]. 
 
 
-**Example (Jade):**
+**Example (Pug):**
 
-```Jade
+```pug
     option(data-from="someApiFn", data-path="foo.bar.baz", data-key="keyFld", data-value="descFld")
 ```
 
