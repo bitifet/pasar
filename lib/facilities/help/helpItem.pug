@@ -1,7 +1,7 @@
-extends ../layout.jade
-- var title = path+" ("+meta.title+")";
+extends ../layout.pug
 
 block contents
+    - var title = path+" ("+meta.title+")";
     nav.menu
         a(href="../"+name) Index
     h1= meta.title
@@ -41,19 +41,19 @@ block contents
         div
             h2 Examples:
                 ul
-                  each eBlock, method in examples
-                    each e, i in eBlock
-                        li
-                            b.
-                                (#{e.method})&nbsp;
-                            a(href=e.url(), title=e.comments)= e.label
-                            if (method == "get")
-                                span &nbsp;
-                                select.fmtExamples(style="width:8em")
-                                    option(value="",selected,disabled) Export as...
-                                    each fitems, ext in filters
-                                        - var m = ext+": "+Object.keys(fitems).filter(function(k){return fitems[k].contents}).join(", ");
-                                        option(value=e.url(ext))= m
+                    each eBlock, method in examples
+                        each e, i in eBlock
+                            li
+                                b.
+                                    (#{e.method})&nbsp;
+                                a(href=e.url(), title=e.comments)= e.label
+                                if (method == "get")
+                                    span &nbsp;
+                                    select.fmtExamples(style="width:8em")
+                                        option(value="",selected,disabled) Export as...
+                                        each fitems, ext in filters
+                                            - var m = ext+": "+Object.keys(fitems).filter(function(k){return fitems[k].contents}).join(", ");
+                                            option(value=e.url(ext))= m
     script.
         $("select.fmtExamples").each(function(){
             var selector = $(this);

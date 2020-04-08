@@ -1,0 +1,50 @@
+extends ../layout.pug
+
+append head
+    style
+        include ./formItem.css
+
+block contents
+    nav.menu
+        a(href="../"+name) Index
+    div.header
+        h1.
+            #{meta.title} Form (#{path[0]})
+    div.formWindow
+        div.formContainer
+            div.tabs
+                div
+                    each f, mtd in methods
+                        div.form(data-id=mtd, data-path=path[0] data-method=mtd)
+                            div.fields !{f.tpl} 
+                            div.formButtons
+                                button.reset Reset
+                                button.submit Submit
+                                if Object.keys(filters).length
+                                    select.download
+                                        option(selected,disabled,value="")="Download as..."
+                                        each fitems, ext in filters
+                                            each fdata, k in fitems
+                                                option(value=ext)=ext
+
+                            div.controls
+                                ul.tabbar
+                                    each ff, fname in methods
+                                        li(data-id=fname)= fname.toUpperCase()
+                                ul.buttons
+                                    if f.error
+                                        li.error= f.error
+                                    if f.isDefault
+                                        - var hint="This is the default form template.  Use JSON data to provide your request parameters or configure specific form template in API definition.";
+                                        li.info(title=hint)
+                                          | (Default Form)
+    div.resultsWindow
+        div.resultsContainer
+            header
+                h2 Results
+                button#clearResults Clear
+            div#results
+
+    script
+        include ./formClient.js
+

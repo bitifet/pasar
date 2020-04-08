@@ -1,0 +1,106 @@
+doctype html
+html
+    head
+        block head
+            title= title
+            style.
+                *[title]{
+                    cursor: help;
+                }
+                input, textarea{
+                    cursor: text;
+                }
+                input[type=checkbox], select, a {
+                    cursor: pointer;
+                }
+                .loading {
+                    cursor: wait;
+                }
+                code {
+                    display: block;
+                    background: #dddddd;
+                    padding: 1em;
+                }
+                /* NAV MENÚ: {{{ */
+                nav.menu {
+                    position: fixed;
+                    top: 1em;
+                    right: .5em;
+                }
+                nav.menu a {
+                    padding: .5em;
+                    background: #eeeeff;
+                    border: #0066aa solid 1px;
+                    border-right: #004466 solid 3px;
+                    border-bottom: #004466 solid 3px;
+                }
+                nav.menu a:hover {
+                    border: #0066aa solid 3px;
+                    border-right: #004466 solid 1px;
+                    border-bottom: #004466 solid 1px;
+                }
+                /* }}} */
+                /* TABS: {{{ */
+                .tabs {
+                    display:none;
+                }
+                .tabs>ul {
+                    margin-left: 0px;
+                    padding-left: 0px;
+                    margin-bottom: 3px;
+                }
+                .tabs>ul li {
+                    display: inline;
+                    padding-left: .5em;
+                    padding-right: .5em;
+                    margin-right: 10px;
+                    list-style-type: none;
+                    border-left: #000055 solid 4px;
+                    border-right-width: 3px;
+                    border-bottom: #000055 solid 1px;
+                    cursor: pointer;
+                }
+                .tabs>ul li:hover {
+                    border-left: #000055 solid 1px;
+                    margin-right: 12px;
+                }
+                .tabs>ul li.selected
+                , ul.tabbar li.selected
+                {
+                    background: #ccddee !important;
+                }
+                .tabs>div {
+                    border: #999999 solid 1px;
+                    padding: 1em;
+                    margin-top: 0px;
+                }
+                /* }}} */
+            script
+                include ./_libs/jquery.min.js
+    body
+        block contents
+        script.
+            $(".tabs").each(function() {
+                var tabs = $("ul.tabbar", this).find("li");
+                if (! tabs.length) { // Backward compatibility failback.
+                    // FIXME: Check if this is really needed somewhere (I think not!)
+                    tabs = $("ul.tabbar", this).first().find("li");
+                };
+                var panes = $("div", this).first().children("div");
+   
+                panes.hide();
+   
+                tabs.each(function(){
+                    var t = $(this);
+                    var k = t.data("id");
+                    var p = panes.filter(function(i, p){return $(p).data("id") == k;});
+                    t.click(function() {
+                        tabs.removeClass("selected");
+                        tabs.filter("[data-id="+k+"]").addClass("selected");
+                        panes.hide();
+                        p.show();
+                    });
+                }).first().click();
+   
+                $(this).show();
+            });
