@@ -10,7 +10,6 @@
 //
 "use strict";
 module.exports = {
-    corePromiseEngine: "bluebird",
     defaultOutputFilter: "json",
     defaultTimeoutMessage: "Timeout!",
     defaultLogErrors: true,

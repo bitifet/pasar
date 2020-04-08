@@ -45,7 +45,7 @@ function PASAR(api, Options, cri) { //{{{
     me.facilities = {};                     // Facility models.
     me.R.Promise = me.Prefs.promiseEngine   // Pick for Promise engine.//{{{
         ? me.Prefs.promiseEngine
-        : require(Cfg.corePromiseEngine)
+        : Promise
     ;//}}}
     me.Filters = Fmt.load(                  // Load output filters.//{{{
         {}
