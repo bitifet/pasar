@@ -1,6 +1,10 @@
 CHANGELOG.txt
 =============
 
+"version": "1.4.2" - Security upgrade.
+
+    Upgraded pug to version 3.
+
 "version": "1.4.1" - Security upgrade.
 
     Bump lodash from 4.17.15 to 4.17.19
